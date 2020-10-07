@@ -127,9 +127,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e464a3e4565494e44b1a1387d32ba0d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SnapPointPlaced: {fileID: 6784183832080218027}
-  SnapPointHover: {fileID: 6784183831217665583}
-  Glow: {fileID: 760899690145674640}
+  snapPointPlaced: {fileID: 6784183832080218027}
+  snapPointHover: {fileID: 6784183831217665583}
+  glow: {fileID: 127387836753522474}
+  state: 0
+  blackMat: {fileID: 0}
+  whiteMat: {fileID: 0}
 --- !u!1 &6784183832080218026
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,6 +236,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8809829db7a2af45bdc47035929c0ab, type: 3}
+--- !u!1 &127387836753522474 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f8809829db7a2af45bdc47035929c0ab, type: 3}
+  m_PrefabInstance: {fileID: 938432357766730363}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &760899690145674640 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f8809829db7a2af45bdc47035929c0ab, type: 3}

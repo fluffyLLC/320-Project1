@@ -3,7 +3,12 @@ guid: 780797365c21e0c44aa4292f08fb2056
 ModelImporter:
   serializedVersion: 20101
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: white_chess
+    second: {fileID: 2100000, guid: e6b379ca28477314280d9e9f80cddcae, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
