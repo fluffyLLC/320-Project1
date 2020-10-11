@@ -3,22 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(BoardBuilder))]
+[CustomEditor(typeof(Board))]
 public class NewBehaviourScript : Editor
 {
     public override void OnInspectorGUI()
     {
-        BoardBuilder boardBuilder = (BoardBuilder)target;
+        Board board = (Board)target;
         DrawDefaultInspector();
 
         GUILayout.BeginHorizontal();
+
         if (GUILayout.Button("Build Board")) {
-            boardBuilder.BuildBoard();
+            board.BuildBoard();
         }
 
         if (GUILayout.Button("Destroy Board"))
         {
-            boardBuilder.DeconstructBoard();
+            board.DeconstructBoard();
         }
 
         GUILayout.EndHorizontal();

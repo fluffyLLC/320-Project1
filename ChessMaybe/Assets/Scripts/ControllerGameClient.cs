@@ -1,17 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
+
 using TMPro;
-using System;
+
+
+
 
 public class ControllerGameClient : MonoBehaviour
 {
 
-    static ControllerGameClient singleton;
+    static public ControllerGameClient singleton;
     // Start is called before the first frame update
 
     TcpClient socket = new TcpClient();
@@ -20,10 +23,12 @@ public class ControllerGameClient : MonoBehaviour
 
     public TMP_InputField inputHost;
     public TMP_InputField inputPort;
+    public TMP_InputField inputUsername;
 
-    public Transform paneHostDetails;
-    public Transform panelUsername;
-    public Transform panelGameplay;
+    public ControllerGameplay controllerGameplay;
+
+    
+    //public GameplayController panelGameplay;
 
     void Start()
     {
@@ -37,6 +42,9 @@ public class ControllerGameClient : MonoBehaviour
         else {
             singleton = this;
             DontDestroyOnLoad(gameObject); //don't destroy when you load a new scene
+
+            controllerGameplay.SwitchScreenState(ScreenState.Conection);
+            
         }
 
         
@@ -50,8 +58,8 @@ public class ControllerGameClient : MonoBehaviour
         UInt16.TryParse(inputPort.text, out ushort port);
 
         TryToConnect(host, port);
+        
 
-    
     }
 
     async public void TryToConnect(string host, int port) {
@@ -61,12 +69,22 @@ public class ControllerGameClient : MonoBehaviour
         {
             await socket.ConnectAsync(host, port); // neeed async to use the await keyword
             StartRecevingPackets();
+            controllerGameplay.SwitchScreenState(ScreenState.Username);
         }
         catch (Exception e) {
-            print("FAILED TO CONNECT...");
-            
+            print("FAILED TO CONNECT... " + e);
         }
 
+    }
+
+    public void OnNameSubmit() { //come back to this
+
+        string user = inputUsername.text;
+
+        Buffer packet = PacketBuilder.Join(user);
+
+        SendPacketToServer(packet);
+    
     }
 
     async private void StartRecevingPackets()
@@ -80,15 +98,16 @@ public class ControllerGameClient : MonoBehaviour
 
             try
             {
+               // print("reading");
                 int bytesRead = await socket.GetStream().ReadAsync(data, 0, maxPacketSize);
 
-               buffer.Concat(data,bytesRead);
+                buffer.Concat(data,bytesRead);
 
                 ProcessPackets();
             }
-            catch (Exception e) { 
-            
-            
+            catch (Exception e) {
+
+                print(e);
             }
         
         
@@ -97,8 +116,13 @@ public class ControllerGameClient : MonoBehaviour
 
     void ProcessPackets() {
         if (buffer.Length < 4) return; // Not enough data in buffer
+        print("Buffer Contents: " + buffer);
+
 
         string packetIdentifier = buffer.ReadString(0, 4);
+
+       // print("packet Identifyer: " + packetIdentifier);
+        
 
         switch (packetIdentifier) {
             case "JOIN":
@@ -107,16 +131,15 @@ public class ControllerGameClient : MonoBehaviour
 
                 if (joinResponse == 1 || joinResponse == 2 || joinResponse == 3)
                 {
-
-                    paneHostDetails.gameObject.SetActive(false);
-                    panelUsername.gameObject.SetActive(false);
-                    panelGameplay.gameObject.SetActive(true);
+                    controllerGameplay.SwitchScreenState(ScreenState.Game);
                 }
-                else {
+                else if (joinResponse == 9) {
+                    controllerGameplay.SwitchScreenState(ScreenState.Conection);
+                } else {
                     //TODO: show error
-                    paneHostDetails.gameObject.SetActive(false);
-                    panelUsername.gameObject.SetActive(true);
-                    panelGameplay.gameObject.SetActive(false);
+                    controllerGameplay.SwitchScreenState(ScreenState.Username);
+                    inputUsername.text = "";
+                    print(joinResponse);
                 }
             
                 //TODO: change which screen we are looking at
@@ -127,6 +150,7 @@ public class ControllerGameClient : MonoBehaviour
                 break;
             case "UPDT":
                 if (buffer.Length < 15) return;
+                print("update recieved");
 
                 byte whoseTurn = buffer.ReadUInt8(4);
                 byte gameStatus = buffer.ReadUInt8(5);
@@ -139,14 +163,13 @@ public class ControllerGameClient : MonoBehaviour
                 
                 }
 
+                controllerGameplay.SwitchScreenState(ScreenState.Game);
+               
 
-                paneHostDetails.gameObject.SetActive(false);
-                panelUsername.gameObject.SetActive(false);
-                panelGameplay.gameObject.SetActive(true);
-                //TODO: update all of the interface to reflect game state:
-                // - whose turn
-                // - 9 spaces on teh board
-                // - status
+
+               // panelGameplay.UpdateFromServer(gameStatus, whoseTurn, spaces);
+
+                
 
                 //TODO: consume data
                 buffer.Consume(15);
@@ -167,9 +190,8 @@ public class ControllerGameClient : MonoBehaviour
                 string username = buffer.ReadString(7, usernameLength);
                 string chatMessage = buffer.ReadString(7 + usernameLength, messageLength);
 
-                paneHostDetails.gameObject.SetActive(false);
-                panelUsername.gameObject.SetActive(false);
-                panelGameplay.gameObject.SetActive(true);
+                
+                //panelGameplay.gameObject.SetActive(true);
 
                 //TODO: consume data
                 buffer.Consume(fullPacketLength);
@@ -181,12 +203,31 @@ public class ControllerGameClient : MonoBehaviour
 
                 break;
 
-
-
-
-
-
         }
     
     }
+
+
+    async public void SendPacketToServer(Buffer packet) {
+
+        if (!socket.Connected) return;
+
+        await socket.GetStream().WriteAsync(packet.bytes, 0, packet.bytes.Length);
+
+    
+    }
+
+    public void SendPlayPacket(int x, int y) {
+        //Buffer packet = PacketBuilder.Play(x, y);
+
+        SendPacketToServer(PacketBuilder.Play(x, y));
+        //packet.WriteString("PLAY", 0);
+        
+
+
+    }
+
+
+
+
 }

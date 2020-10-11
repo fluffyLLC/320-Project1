@@ -1,0 +1,124 @@
+Chess Protocol v1.0
+===============================
+
+Whatneeds to be stores on the server?
+ - state of the board
+ - whose turn it is
+ - if someone has one
+
+
+Packets from server
+-------------------
+
+JOIN (response)(placeholder) - When the server recives a JOIN packet, it must decide wether or not the clinet is allowed to join.
+
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ascii		packet type: "JOIN"
+	4	1	uint8		join response (see below)
+
+	join response
+	---------------------------------------
+	1: player 1
+	2: player 2
+	3: spectator
+	(denied:)
+	4: username to short
+	5: username too long
+	6: username has invalid characcters
+	7: username already taken
+	8: username not allowed
+	9: game is full
+
+
+
+
+HOVR (response) - return the valid move set for the peice the player is hovering over
+	O	L	Datatype	Desc
+	-------------------------------------------
+	0	4	ascii		packet type: "HOVR"
+	4	1	uint8		row of the hovering p
+	4   8   uint8 x8    valid moveset for the peice inu consideration 
+
+	
+UPDT (in progress)- The state of the game
+
+	O	L	Datatype	Desc
+	-------------------------------------------
+	0	4	ascii		packet type: "UPDT"
+	4	1	uint8		whose turn (1/2)
+	5	1	uint8		victory state (seebelow)
+
+		64	uint8 x64	the board state?
+
+	who's won
+	--------------------------------------------
+	0: currently playing the game
+	1: player "X" has won the game
+	2: player "O" has won the game
+	3: cat's game
+	4: game canceled
+
+CHAT (placeHolder)- when reciving a chat packet from a client the server sends this chat packet out to all connected, exept for the orifinal sender
+
+	O	L	Datatype	Desc
+	---------------------------------------------------
+	0	4	ASCII		packet type: "Chat"
+	4	1	uint8		length of the username
+	5	2	Uint16		length of the chat messege
+
+
+			
+
+	
+
+
+
+
+Packets from Client
+-------------------
+
+JOIN (request) (placeHolder) - after establishing a connection w/the server, clinet will send a JOIN packet w/ a desired username. The server will send back a response.
+
+
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ASCII		packet type "JOIN"
+	4	1	uint8		howlong teh username is (255 max)
+	5	?	ascii		the desired username	
+	?	1	uint8		Packet Validator
+
+
+HOVR - This packet is submitted when a player hovers their mouse over a chess peice
+	
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ASCII		packet type "HOVR"
+	4	1	uint8		colom number of the peice the player is hovering over
+	5	1	uint8		row number of the peice the player is hovering over
+	
+
+
+PLAY - This packet should be submitted when the player takes their turn
+	
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"PLAY"	
+	4	1	uint8		colom number of peice being moved
+	5	1	uint8		row number of peice being moved
+	6	1	uint8		colom number of the peices target location
+	7	1	uint8		row number of the peices target location
+	8	1	uint8		Packet Validator
+		
+	
+
+CHAT - the player wants to chat.
+	
+	O	L	Datatype	Desc
+	-----------------------------------------------------
+	0	4	ASCII		packet type: "CHAT"
+	4	1	uint16		length of messege(255 max)
+	6	?	ASCII		messege for the chat	
+	?	1	uint8		Packet Validator	
+
+

@@ -9,7 +9,8 @@ public enum Peices {
     Knight,
     Bishop,
     Queen,
-    King
+    King,
+    Empty
 }
 
 
@@ -20,14 +21,16 @@ public class PlayerPeice : MonoBehaviour
 
     public static string[] meshPath = { "Mesh/Chess_Centered_Pawn", "Mesh/Chess_Centered_Rook", "Mesh/Chess_Centered_Knight", "Mesh/Chess_Centered_Bishop", "Mesh/Chess_Centered_Queen", "Mesh/Chess_Centered_King" };
     public GameObject mesh;
+    public Peices peiceType;
     public int owner = 1;
     
 
 
     public void init(Transform location, Peices peice, Material mat, int owner){
-
+        peiceType = peice;
+        this.owner = owner;
         Quaternion rot = owner == 1 ? Quaternion.identity : Quaternion.Euler(0,180,0);
-        print(mat.name);
+        //print(mat.name);
         switch (peice)
         {
             case Peices.Pawn:
@@ -60,16 +63,15 @@ public class PlayerPeice : MonoBehaviour
     private void HandleInstantiateMesh(Material mat, Quaternion rot, Peices peice)
     {
         mesh = InstantiateMesh(meshPath[(int)peice], transform, rot);
+        mesh.AddComponent<CapsuleCollider>();
  
        MeshRenderer matAcess =  mesh.GetComponent<MeshRenderer>();
         // print("Before Name: " + matAcess.materials[1].name);
         if (matAcess != null)
         {
-            print("we got acess bois");
+            //print("we got acess bois");
             matAcess.material = mat;
         }
-      // print("AfterName: " + matAcess.materials[1].name);
-
 
     }
 
@@ -91,10 +93,6 @@ public class PlayerPeice : MonoBehaviour
     {
 
         return Instantiate(Resources.Load<GameObject>(path), parent.position, rotation,parent) as GameObject;
-
-        //Instantiate()
-
-        //Instantiate()
 
     }
 

@@ -195,21 +195,13 @@ public class BoardSegment : MonoBehaviour
                     break;
 
                 default:
-                    //print error
+                    
                     break;
-                
            
             }
 
 
         }
-
-
-
-        
-
-
-
 
        return playerPeice;
     }
@@ -218,10 +210,19 @@ public class BoardSegment : MonoBehaviour
     {
 
         GameObject playerPeice = InstantiatePeice();
-       
+
         playerPeice.GetComponent<PlayerPeice>().init(snapPointPlaced, peice, peiceMat, player);
-        
-        switch (peice) {
+
+        SetPeice(isPlayer1, peice);
+
+        return playerPeice;
+
+    }
+
+    private void SetPeice(bool isPlayer1, Peices peice)
+    {
+        switch (peice)
+        {
             case Peices.Pawn:
                 state = isPlayer1 ? SegmentOccupationState.P1Pawn : SegmentOccupationState.P2Pawn;
                 break;
@@ -240,13 +241,13 @@ public class BoardSegment : MonoBehaviour
             case Peices.King:
                 state = isPlayer1 ? SegmentOccupationState.P1King : SegmentOccupationState.P2King;
                 break;
+            case Peices.Empty:
+                state = SegmentOccupationState.Empty;
+                break;
             default:
                 state = SegmentOccupationState.Empty;
                 break;
         }
-        
-        return playerPeice;
-
     }
 
     public GameObject InstantiatePeice() {
@@ -274,7 +275,7 @@ public class BoardSegment : MonoBehaviour
 
    
 
-
+    /*
     // Start is called before the first frame update
     void Start()
     {
@@ -286,4 +287,5 @@ public class BoardSegment : MonoBehaviour
     {
         
     }
+    */
 }
