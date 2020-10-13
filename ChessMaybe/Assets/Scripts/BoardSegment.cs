@@ -13,7 +13,7 @@ public struct BoardPOS
 
     public int packetIndex {
         get {
-            return (indexY * 8) + (1 + indexX);
+            return (indexY * 8) + indexX;//(1 + indexX);
         }
     }
 

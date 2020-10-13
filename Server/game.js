@@ -1,7 +1,7 @@
 
 exports.Game = {
 
-	whoseTurn:2,
+	whoseTurn:1,
 	whoHasWon:0,
 	board:[["R1","N1","B1","K1","Q1","B1","N1","R1"],
 		   ["P1","P1","P1","P1","P1","P1","P1","P1"],
@@ -21,20 +21,23 @@ exports.Game = {
 
 		if(!this.isClientTurn(client)) return;
 
-		if(x < 0 || y < 0) return;//ignore moves off the board
+		//ignore moves off the board
 
-		if(y >= this.board.length) return;//ignore moves off the board
-		if(x >= this.board[y].length) return;//ignore moves off the board
+		
 
 		//if(this.board[y][x] > 0) return; //ignore moves on taken spaces
 
 		//this.board[y][x] = this.whoseTurn; //sets board state
 
+		
+		//this.checkStateAndUpdate();
+
+	}, toggleTurn(){
 		this.whoseTurn = (this.whoseTurn == 1) ? 2 : 1;//toggles turn to next player
-		this.checkStateAndUpdate();
 
 	},
 	isClientTurn(client){
+		return true;//TODO: Remove This
 
 		if(this.whoseTurn == 1 && client == this.clientP1) return true;
 		if(this.whoseTurn == 2 && client == this.clientP2) return true;
@@ -42,15 +45,26 @@ exports.Game = {
 		return false;
 	},
 	movePeiceInState(currentX,currentY,targetX,targetY){
+		
+		if(currentX < 0 || currentY < 0 || targetX < 0 || targetY < 0) return false;
+		if(currentY >= this.board.length) return false;//ignore moves off the board
+		if(currentX >= this.board[currentY].length) return false;//ignore moves off the board
+		if(targetY >= this.board.length) return false;//ignore moves off the board
+		if(targetX >= this.board[targetY].length) return false;
+
 		if(this.board[currentY][currentX] == 0) return false;//return false?
+
 		if(!this.checkOwnesPeice(this.board[currentY][currentX])) return false;
 		if(!this.checkStepOnSelf(this.board[targetY][targetX])) return false;
+		//ignore moves off the board
+
 
 		this.board[targetY][targetX] = this.board[currentY][currentX];
 		this.board[currentY][currentX] = 0;
 		
 		return true;
 	},
+
 	checkStepOnSelf(boardState){//return true if we can take the peice in question
 		if(boardState == 0) return true;
 		return !this.checkOwnesPeice(boardState);
@@ -70,8 +84,9 @@ exports.Game = {
 
 		return false;
 
-
-	},checkStateAndUpdate(){
+	},
+   /*
+	checkStateAndUpdate(){
 
 		//ToDO: look for game over
 
@@ -79,6 +94,7 @@ exports.Game = {
 		Server.broadcastToAll(packet);
 		//TODO: send UPDT packet to ALL
 	}
+	*/
 
 }
 

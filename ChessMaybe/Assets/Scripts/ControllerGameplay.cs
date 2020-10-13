@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public enum ScreenState
@@ -99,7 +100,7 @@ public class ControllerGameplay : MonoBehaviour
                         
                         segment = hit.collider.gameObject.GetComponent<BoardSegment>();
 
-
+                        ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Play((int)peice.acessIndex.x, (int)peice.acessIndex.y, segment.pos.indexX, segment.pos.indexY));
 
 
 
@@ -112,7 +113,7 @@ public class ControllerGameplay : MonoBehaviour
 
         if (peiceSelected) {
             ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Hover((int)peice.acessIndex.x, (int)peice.acessIndex.y));
-
+            HoverPeice((int)peice.acessIndex.x, (int)peice.acessIndex.y);
         }
     }//update
 
@@ -163,6 +164,21 @@ public class ControllerGameplay : MonoBehaviour
         Vector3 hoverTarget = Board.boardSpaces[x, y].GetComponent<BoardSegment>().snapPointHover.position;
         
         peice.HoverUp(hoverTarget);
+        
+    }
+
+    public void ProcessUpdate(int gameStatus, int whoseTurn, byte[] spaces) {
+
+        if (gameBoard.HandleMove(spaces)) {
+            peiceSelected = false;
+            peice = null;
+            segment = null;
+        }
+
+
+        
+        
+    
         
     }
 

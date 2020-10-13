@@ -155,21 +155,29 @@ public class ControllerGameClient : MonoBehaviour
                 buffer.Consume(5);
                 break;
             case "UPDT":
-                if (buffer.Length < 15) return;
+                if (buffer.Length < 70) return; //TODO: give players the ability to pass
+
                 print("update recieved");
 
                 byte whoseTurn = buffer.ReadUInt8(4);
                 byte gameStatus = buffer.ReadUInt8(5);
 
-                byte[] spaces = new byte[9];
+                byte[] spaces = new byte[64];
 
-                for (int i = 0; i < 9; i++) {
+                for (int i = 0; i < 64; i++) {
 
                     spaces[i] = buffer.ReadUInt8(6 + i);
                 
                 }
 
-                controllerGameplay.SwitchScreenState(ScreenState.Game);
+                print(spaces);
+
+
+                controllerGameplay.ProcessUpdate(gameStatus, whoseTurn, spaces);
+
+                if (controllerGameplay.screenState != ScreenState.Game) {
+                    controllerGameplay.SwitchScreenState(ScreenState.Game);
+                }
                
 
 
@@ -178,7 +186,7 @@ public class ControllerGameClient : MonoBehaviour
                 
 
                 //TODO: consume data
-                buffer.Consume(15);
+                buffer.Consume(70);
 
                 break;
             case "CHAT":
@@ -203,20 +211,10 @@ public class ControllerGameClient : MonoBehaviour
                 buffer.Consume(fullPacketLength);
                 break;
             case "HOVR":
+
                 if (buffer.Length <= 5) return;
 
-                byte x = buffer.ReadUInt8(4);
-                byte y = buffer.ReadUInt8(5);
-
-                if (controllerGameplay.isMyTurn)
-                {
-                    //TODO: processBitmask
-                }
-                else {
-                    controllerGameplay.HoverPeice(x, y);
-                    buffer.Consume(6);
-                }
-                
+                HandleHover();
 
                 break;
             default:
@@ -230,11 +228,26 @@ public class ControllerGameClient : MonoBehaviour
     
     }
 
+    private void HandleHover()
+    {
+        byte x = buffer.ReadUInt8(4);
+        byte y = buffer.ReadUInt8(5);
+
+        if (controllerGameplay.isMyTurn)
+        {
+            //TODO: processBitmask
+        }
+        else
+        {
+            controllerGameplay.HoverPeice(x, y);
+            buffer.Consume(6);
+        }
+    }
 
     async public void SendPacketToServer(Buffer packet) {
 
         if (!socket.Connected) return;
-        print("sending");
+        //print("sending");
 
         await socket.GetStream().WriteAsync(packet.bytes, 0, packet.bytes.Length);
 

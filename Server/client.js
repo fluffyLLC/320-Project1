@@ -29,13 +29,13 @@ exports.Client = class Client{
 		onData(data){
 			this.buffer = Buffer.concat([this.buffer,data]);
 			//console.log(this.buffer);
-			console.log("data recived");
+			//console.log("data recived");
 
 			if(this.buffer.length < 4) return; // not enough data
 
 			const packetIdentifier = this.buffer.slice(0,4).toString();
 
-			console.log("packet identifyer: " + packetIdentifier);
+			//console.log("packet identifyer: " + packetIdentifier);
 
 			switch(packetIdentifier){
 				case "JOIN": 
@@ -67,7 +67,12 @@ exports.Client = class Client{
 					const targetX = this.buffer.readUInt8(6);
 					const targetY = this.buffer.readUInt8(7);
 
-					
+					//TODO: decouple move & turn checks from data mod and return an error number for invalid moves
+					if(this.server.game.movePeiceInState(currentX,currentY,targetX,targetY)) {
+
+						this.server.broadcastToAll(PacketBuilder.update(this.server.game));
+
+					}
 
 					//console.log("user wants to play at: "+x+" "+y);
 					
@@ -108,7 +113,7 @@ exports.Client = class Client{
 		}
 
 		sendPacket(packet){
-			console.log("sending packet: " + packet);
+			//console.log("sending packet: " + packet);
 			this.socket.write(packet);
 		}
 

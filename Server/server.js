@@ -117,7 +117,7 @@ exports.Server = { //we can use js object notation too
 	},
 	broadcastToAll(packet){
 		this.clients.forEach(c=>{
-			console.log("broadcasting:" + packet);
+			//console.log("broadcasting:" + packet);
 			//if(c.username){
 				c.sendPacket(packet);
 			//}

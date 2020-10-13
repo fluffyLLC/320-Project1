@@ -31,6 +31,9 @@ JOIN (response)(placeholder) - When the server recives a JOIN packet, it must de
 	9: game is full
 
 
+// MOVE (response) - sent if the player makes an invalid move
+
+
 
 
 HOVR (response) - return the valid move set for the peice the player is hovering over
@@ -51,7 +54,7 @@ UPDT (in progress)- The state of the game
 	4	1	uint8		whose turn (1/2)
 	5	1	uint8		victory state (seebelow)
 
-		64	uint8 x64	the board state?
+	6	64	uint8 x64	the board state (seebelow)
 
 	who's won
 	--------------------------------------------
@@ -59,6 +62,28 @@ UPDT (in progress)- The state of the game
 	1: player 1 has won the game
 	2: player 2 has won the game
 	3: game canceled
+
+	Board State
+	--------------------------------------------
+	0:	Empty
+
+    		//Typically "white"
+    1:	P1 Pawn
+    2:	P1 Rook
+    3:	P1 Knight
+    4:	P1 Bishop
+    5:	P1 Queen
+    6:	P1 King
+
+    		//Typically "black"
+    7:	P2 Pawn
+    8:	P2 Rook
+    9:	P2 Knight
+    10:	P2 Bishop
+    11:	P2 Queen
+    12:	P2 King
+
+
 
 CHAT (placeHolder)- when reciving a chat packet from a client the server sends this chat packet out to all connected, exept for the orifinal sender
 
@@ -111,7 +136,14 @@ PLAY - This packet should be submitted when the player takes their turn
 	7	1	uint8		row number of the peices target location
 	//8	1	uint8		Packet Validator
 		
-	
+
+/*
+
+CHEK -
+
+CKMT - 
+
+*/
 
 CHAT - the player wants to chat.
 	

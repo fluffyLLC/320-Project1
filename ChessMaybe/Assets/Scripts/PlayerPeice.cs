@@ -82,21 +82,28 @@ public class PlayerPeice : MonoBehaviour
 
     void Update() {
 
-        if (animateHover) {
+        if (animateHover)
+        {
             transform.position = Vector3.Lerp(transform.position, hoverTarget, lerpPercent);
-            
-            if (transform.position == hoverTarget) {
+
+            if (transform.position == hoverTarget)
+            {
                 animateHover = false;
             }
 
-        } else if (!animateHover && transform.position != groundedTarget) {
+        }
+        else if (animateMove)
+        {
+            transform.position = Vector3.Lerp(transform.position, moveTarget, lerpPercent);
+            
+            if (transform.position == moveTarget) {
+                animateMove = false;
+            }
+
+        }
+        else if (!animateHover && transform.position != groundedTarget)
+        {
             transform.position = Vector3.Lerp(transform.position, groundedTarget, lerpPercent);
-
-        } else if (animateMove) {
-
-
-        } else if (animateGround) { 
-        
         }
     
     
@@ -108,7 +115,7 @@ public class PlayerPeice : MonoBehaviour
         mesh.AddComponent<CapsuleCollider>();
         mesh.layer = LayerMask.NameToLayer("Peices");
 
-        print(mesh.layer);
+        //print(mesh.layer);
 
        MeshRenderer matAcess =  mesh.GetComponent<MeshRenderer>();
         // print("Before Name: " + matAcess.materials[1].name);

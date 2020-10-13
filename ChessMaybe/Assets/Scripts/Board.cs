@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using UnityEditor.Rendering;
 using UnityEngine;
-
-
-
+using UnityEngine.PlayerLoop;
 
 public class Board : MonoBehaviour
 {
@@ -17,7 +16,7 @@ public class Board : MonoBehaviour
     private int boardSize = 8;
     //public GameObject boardSegment;
 
-    public static GameObject[,] boardSpaces;
+    public static GameObject[,] boardSpaces; //TODO: store these as the relevant scripts rather than gameObjects
     public static GameObject[,] peices;
 
     //TODO: Generate an *x8 board
@@ -99,6 +98,50 @@ public class Board : MonoBehaviour
 
         return boardSpaces;
  
+    }
+
+    public void DeconstructBoard()
+    {
+        if (boardSpaces == null)
+        {
+            return;
+        }
+
+
+        for (int y = 0; y < boardSize; y++)
+        {
+
+            for (int x = 0; x < boardSize; x++)
+            {
+                //GameObject b = InstantiateSegmant(new Vector3((1 + offset) * x, 0, (1 + offset) * y));
+                GameObject b = boardSpaces[x, y];
+                GameObject p = peices[x, y];
+
+                if (Application.isPlaying)
+                {
+                    Destroy(b);
+                    if (p)
+                    {
+                        Destroy(p); //TODO: create a "clear board" function that just clears the play peices
+
+                    }
+                }
+                else
+                {
+                    DestroyImmediate(b);
+                    if (p)
+                    {
+                        DestroyImmediate(p);
+
+                    }
+                }
+
+            }
+
+        }
+
+        boardSpaces = null;
+
     }
 
 
@@ -185,45 +228,80 @@ public class Board : MonoBehaviour
     
     }*/
 
-    public void DeconstructBoard() {
-        if (boardSpaces == null) {
-            return;
-        }
+    public bool HandleMove(byte[] updatedState) {
+        Vector2 currentIndex = new Vector2(-1, -1);
+        Vector2 targetIndex = new Vector2(-1,-1);
+        
 
+        //determine which spaces can need to be updated
+        for (int i = 0; i < updatedState.Length; i++) {
+            int y = i / boardSize;
+            int x = i % boardSize;
 
-        for (int y = 0; y < boardSize; y++)
-        {
-
-            for (int x = 0; x < boardSize; x++)
+            if (updatedState[i] == 0)
             {
-                //GameObject b = InstantiateSegmant(new Vector3((1 + offset) * x, 0, (1 + offset) * y));
-                GameObject b = boardSpaces[x, y];
-                GameObject p = peices[x, y];
-
-                if (Application.isPlaying)
+                if (updatedState[i] != (int)boardSpaces[x, y].GetComponent<BoardSegment>().state)
                 {
-                    Destroy(b);
-                    if (p) {
-                        Destroy(p); //TODO: create a "clear board" function that just clears the play peices
+                    currentIndex = new Vector2(x, y);
 
-                    }
                 }
-                else {
-                    DestroyImmediate(b);
-                    if (p)
-                    {
-                        DestroyImmediate(p);
-
-                    }
-                }
-
             }
+            else {
+                if (updatedState[i] != (int)boardSpaces[x, y].GetComponent<BoardSegment>().state) {
+                    targetIndex = new Vector2(x, y);   
+                
+                }
+            }
+        
+        
+        }
+
+        if (targetIndex.x < 0 || targetIndex.y < 0 || currentIndex.x < 0 || currentIndex.y < 0) return false; //there was no change in board state
+
+        BoardSegment targetSegmant = boardSpaces[(int)targetIndex.x, (int)targetIndex.y].GetComponent<BoardSegment>();
+        //BoardSegment currentSegmant = boardSpaces[(int)currentIndex.x, (int)currentIndex.y].GetComponent<BoardSegment>();
+
+        //remove "taken peices"
+        SegmentOccupationState futureState = (SegmentOccupationState)updatedState[targetSegmant.pos.packetIndex];
+
+        if (OccupiedByEnemey(targetSegmant.state, futureState)) {
+
+            Destroy(peices[(int)targetIndex.x, (int)targetIndex.y]);
+            peices[(int)targetIndex.x, (int)targetIndex.y] = null;
 
         }
 
-        boardSpaces = null;
+        //move peices
+        peices[(int)currentIndex.x, (int)currentIndex.y].GetComponent<PlayerPeice>().MovePeice(targetSegmant.snapPointHover.position, targetSegmant.snapPointPlaced.position); // transform.position = targetSegmant.snapPointPlaced.position;//TODO: Animate Move
+
+        //update gamestate
+        peices[(int)targetIndex.x, (int)targetIndex.y] = peices[(int)currentIndex.x, (int)currentIndex.y];
+        peices[(int)currentIndex.x, (int)currentIndex.y] = null;
+        boardSpaces[(int)targetIndex.x, (int)targetIndex.y].GetComponent<BoardSegment>().state = boardSpaces[(int)currentIndex.x, (int)currentIndex.y].GetComponent<BoardSegment>().state;
+        boardSpaces[(int)currentIndex.x, (int)currentIndex.y].GetComponent<BoardSegment>().state = SegmentOccupationState.Empty;
+
+
+        return true;
+    }
+
+    private bool OccupiedByEnemey(SegmentOccupationState currentState, SegmentOccupationState futureState) {
+        if (currentState == SegmentOccupationState.Empty) {
+            return false;
+        }
+
+        if ((int)futureState < 7 && (int)currentState >= 7) {
+            return true;
+        }else if ((int)futureState >= 7 && (int)currentState < 7)
+        {
+            return true;
+        }
+
+        return false;
+
 
     }
+
+    
 
     public GameObject InstantiateSegmant(Vector3 pos) {
 
