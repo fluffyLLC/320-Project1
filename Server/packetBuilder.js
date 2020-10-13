@@ -14,7 +14,7 @@ exports.PacketBuilder = {
 		const packet = Buffer.alloc(15);
 		packet.write("UPDT",0);
 		packet.write(game.whoseTurn,4);
-		packet.write(game.whoHasWon,4);
+		packet.write(game.whoHasWon,5);
 
 		let offset = 6;
 
@@ -29,5 +29,13 @@ exports.PacketBuilder = {
 		return packet;
 
 	},
+	hover(x,y){//TODO: Impliment bitmask to validate movesets
+		const packet = Buffer.alloc(6);
+		packet.write("HOVR",0);
+		packet.writeUInt8(x,4);
+		packet.writeUInt8(y,5);
+
+		return packet;
+	}
 
 };

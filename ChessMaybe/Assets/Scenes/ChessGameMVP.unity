@@ -199,11 +199,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9b5dcc0e59187a46937ac16ead75340, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boardMask:
+    serializedVersion: 2
+    m_Bits: 256
+  peiceMask:
+    serializedVersion: 2
+    m_Bits: 512
   cameraController: {fileID: 953319189}
   gameBoard: {fileID: 290507230}
   screenState: 0
   paneHostDetails: {fileID: 5489478414544783456}
+  playerState: 0
   panelUsername: {fileID: 5489478414874479842}
+  isMyTurn: 0
 --- !u!1 &625972538
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +238,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 625972538}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -430,14 +438,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953319188}
-  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalRotation: {x: 0.2588191, y: -0, z: -0, w: 0.9659258}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 625972539}
   - {fileID: 963194228}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
@@ -515,7 +523,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -552,7 +560,7 @@ Transform:
   - {fileID: 1928331514}
   - {fileID: 636802072}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1791201200
 GameObject:

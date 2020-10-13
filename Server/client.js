@@ -60,18 +60,38 @@ exports.Client = class Client{
 				break;
 				case "CHAT": break;
 				case "PLAY": 
+					if(this.buffer.length < 8) return;
+
+					const currentX = this.buffer.readUInt8(4);
+					const currentY = this.buffer.readUInt8(5);
+					const targetX = this.buffer.readUInt8(6);
+					const targetY = this.buffer.readUInt8(7);
+
+					
+
+					//console.log("user wants to play at: "+x+" "+y);
+					
+
+					//this.server.game.playMove(this,x,y);
+
+					this.buffer = this.buffer.slice(8);
+
+					
+
+				break;
+				case "HOVR":
 					if(this.buffer.length < 6) return;
 
 					const x = this.buffer.readUInt8(4);
 					const y = this.buffer.readUInt8(5);
+					//TODO:Impliment Bitmask
+					if(this.server.game.isClientTurn(this) && this.server.game.checkOwnesPeice(this.server.game.board[y][x])){
+						//console.log(this.server.game.board[y][x]);
+						this.server.broadcastToAll(PacketBuilder.hover(x,y));
 
-					console.log("user wants to play at: "+x+" "+y);
-					
-					this.server.game.playMove(this,x,y);
+					}
 
 					this.buffer = this.buffer.slice(6);
-
-					
 
 				break;
 				default:

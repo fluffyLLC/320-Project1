@@ -64,6 +64,7 @@ exports.Server = { //we can use js object notation too
 
 
 	},
+	
 	isServerFull(){
 
 		return(this.clients.length >= this.maxConnectedUsers);
@@ -95,20 +96,21 @@ exports.Server = { //we can use js object notation too
 
 		if(isUsernameTaken) return 7;
 
-		if(this.game.clientX == client) return 1; //you are now clientX
+		if(this.game.clientP1 == client) return 1; //you are already p1
 		
-		if(this.game.clientO == client) return 2; //you are now clientX
+		if(this.game.clientP2 == client) return 2; //you are already p2
 		
-		//if(this.game.clientX && this.game.clientX) return 3; //spectator
-
-		if(this.game.clientX){
-			this.game.clientX = client;
-		 	return 1; //you are now clientX
+		if(this.game.clientP1 && this.game.clientP2) return 3; //spectator
+		
+		if(!this.game.clientP1){
+			this.game.clientP1 = client;
+		 	return 1; //you are now p1
 		}
-		if(this.game.clientO){
-			this.game.clientO = client;
-		 	return 2; //you are now clientX
+		if(!this.game.clientP2){
+			this.game.clientP2 = client;
+		 	return 2; //you are now p2
 		}
+		
 
 		return 3; //Spectator
 

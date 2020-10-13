@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2843618546845161761}
   - component: {fileID: 2843618546845161766}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PlayerPeice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,3 +43,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cfa193164be67442bb0340623659455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mesh: {fileID: 0}
+  peiceType: 0
+  owner: 1
+  lerpPercent: 0.2
+  acessIndex: {x: 0, y: 0}
+  animateHover: 0
+  animateMove: 0
+  animateGround: 0
+  hoverTarget: {x: 0, y: 0, z: 0}
+  groundedTarget: {x: 0, y: 0, z: 0}
+  moveTarget: {x: 0, y: 0, z: 0}

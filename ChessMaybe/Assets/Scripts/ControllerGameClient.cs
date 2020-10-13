@@ -67,12 +67,16 @@ public class ControllerGameClient : MonoBehaviour
         if (socket.Connected) return;
         try
         {
+
             await socket.ConnectAsync(host, port); // neeed async to use the await keyword
             StartRecevingPackets();
             controllerGameplay.SwitchScreenState(ScreenState.Username);
+
         }
         catch (Exception e) {
+
             print("FAILED TO CONNECT... " + e);
+
         }
 
     }
@@ -116,7 +120,7 @@ public class ControllerGameClient : MonoBehaviour
 
     void ProcessPackets() {
         if (buffer.Length < 4) return; // Not enough data in buffer
-        print("Buffer Contents: " + buffer);
+        //print("Buffer Contents: " + buffer);
 
 
         string packetIdentifier = buffer.ReadString(0, 4);
@@ -131,6 +135,8 @@ public class ControllerGameClient : MonoBehaviour
 
                 if (joinResponse == 1 || joinResponse == 2 || joinResponse == 3)
                 {
+
+                    controllerGameplay.playerState = joinResponse;
                     controllerGameplay.SwitchScreenState(ScreenState.Game);
                 }
                 else if (joinResponse == 9) {
@@ -196,6 +202,23 @@ public class ControllerGameClient : MonoBehaviour
                 //TODO: consume data
                 buffer.Consume(fullPacketLength);
                 break;
+            case "HOVR":
+                if (buffer.Length <= 5) return;
+
+                byte x = buffer.ReadUInt8(4);
+                byte y = buffer.ReadUInt8(5);
+
+                if (controllerGameplay.isMyTurn)
+                {
+                    //TODO: processBitmask
+                }
+                else {
+                    controllerGameplay.HoverPeice(x, y);
+                    buffer.Consume(6);
+                }
+                
+
+                break;
             default:
                 print("unknown packet identifyer...");
 
@@ -211,6 +234,7 @@ public class ControllerGameClient : MonoBehaviour
     async public void SendPacketToServer(Buffer packet) {
 
         if (!socket.Connected) return;
+        print("sending");
 
         await socket.GetStream().WriteAsync(packet.bytes, 0, packet.bytes.Length);
 
@@ -220,7 +244,7 @@ public class ControllerGameClient : MonoBehaviour
     public void SendPlayPacket(int x, int y) {
         //Buffer packet = PacketBuilder.Play(x, y);
 
-        SendPacketToServer(PacketBuilder.Play(x, y));
+        //SendPacketToServer(PacketBuilder.Play(x, y));
         //packet.WriteString("PLAY", 0);
         
 

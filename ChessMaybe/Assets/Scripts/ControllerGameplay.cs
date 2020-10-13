@@ -12,11 +12,30 @@ public enum ScreenState
 
 public class ControllerGameplay : MonoBehaviour
 {
+
+    public LayerMask boardMask;
+    public LayerMask peiceMask;
+
     public CameraController cameraController;
     public Board gameBoard;
+
     public ScreenState screenState = ScreenState.Conection;
+
     public Transform paneHostDetails;
+    public int playerState; // are we player 1 player 2 or a spectator
+    public bool peiceSelected = false;
+
     public Transform panelUsername;
+
+
+
+    public bool isMyTurn = false;
+    PlayerPeice peice;
+    BoardSegment segment;
+
+    Vector2 selectedPeice = new Vector2(-1,-1);
+    //bool preformingMove;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,29 +45,125 @@ public class ControllerGameplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (screenState == ScreenState.Game) {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (screenState == ScreenState.Game && playerState != 3)
+        {
+            //print("Looping");
+            if (!Input.GetMouseButton(2) || !Input.GetMouseButton(1))//if we're not using the camera
+            {
+                
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    //print("Casting");
+                    RaycastHit hit;
 
-            RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, 50000, peiceMask))
+                    {
+                        //print("castHit");
+                        PlayerPeice p = hit.collider.gameObject.GetComponentInParent<PlayerPeice>();
 
-            if (Physics.Raycast(ray, out hit)) {
-                //Debug.Log(hit.collider.gameObject.name);
+                        if (p.owner == playerState)
+                        {
 
-                PlayerPeice peice = hit.collider.gameObject.GetComponentInParent<PlayerPeice>();
+                            if (p == peice)
+                            {
+                                peiceSelected = false;
+                                peice = null;
+                            }
+                            else
+                            {
 
-                Debug.Log(peice.peiceType + " " + peice.owner);
-            
-            
-            
-            
-            }
+                                peice = p;
+                                ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Hover((int)peice.acessIndex.x, (int)peice.acessIndex.y));
+                                peiceSelected = true;
+                            }
+                        }
 
 
-        
-        
-        
-        
+                        /*
+                        //Debug.Log(hit.collider.gameObject.name);
+                        peice = hit.collider.gameObject.GetComponentInParent<PlayerPeice>();
+                        segment = hit.collider.gameObject.GetComponent<BoardSegment>();
+
+
+                        if (IsPeice(peice, segment)) {
+
+                            ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Hover((int)peice.acessIndex.x, (int)peice.acessIndex.y));
+                        }
+                        //Debug.Log(peice.peiceType + " " + peice.owner);
+                        */
+
+
+                    }
+                    else if (Physics.Raycast(ray, out hit, 50000, boardMask) && peiceSelected) { 
+                        
+                        segment = hit.collider.gameObject.GetComponent<BoardSegment>();
+
+
+
+
+
+                    }//raycasthit
+
+
+                }
+            }//aren't using camera controlls
+        }//isGameState
+
+        if (peiceSelected) {
+            ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Hover((int)peice.acessIndex.x, (int)peice.acessIndex.y));
+
         }
+    }//update
+
+    private bool IsPeice(PlayerPeice peice, BoardSegment segment)
+    {
+        if (peice)
+        {
+
+            return true;
+
+        }
+        else
+        {
+            
+            if (segment)
+            {
+
+                if (segment.state == SegmentOccupationState.Empty)
+                {
+                    this.peice = Board.peices[segment.pos.indexX, segment.pos.indexY].GetComponent<PlayerPeice>();
+                }
+               
+
+                if (this.peice)
+                {
+                    return false;
+
+                }
+                else
+                {
+                    return true;
+
+                }
+            }
+            
+            //return false;
+             
+        }
+
+        return false;
+    }
+
+    public void HoverPeice(int x, int y) {
+        //Vector3 hoverTarget = segment.snapPointHover.position;//Board.boardSpaces[(int)peice.acessIndex.x, (int)peice.acessIndex.y].GetComponent<BoardSegment>().snapPointHover.position
+        //BoardSegment segment = 
+
+        PlayerPeice peice = Board.peices[x, y].GetComponent<PlayerPeice>();
+        Vector3 hoverTarget = Board.boardSpaces[x, y].GetComponent<BoardSegment>().snapPointHover.position;
+        
+        peice.HoverUp(hoverTarget);
+        
     }
 
     public void SwitchScreenState(ScreenState state)

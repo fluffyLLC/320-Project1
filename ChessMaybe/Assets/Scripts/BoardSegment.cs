@@ -120,7 +120,7 @@ public enum SegmentOccupationState
 public class BoardSegment : MonoBehaviour
 {
 
-    BoardPOS pos;
+    public BoardPOS pos;
     public Transform snapPointPlaced;
     public Transform snapPointHover;
     public GameObject glow;
@@ -216,7 +216,6 @@ public class BoardSegment : MonoBehaviour
         SetPeice(isPlayer1, peice);
 
         return playerPeice;
-
     }
 
     private void SetPeice(bool isPlayer1, Peices peice)
@@ -259,14 +258,14 @@ public class BoardSegment : MonoBehaviour
     }
 
 
-    public void toggleGlow() {
+    public void ToggleGlow() {
 
-        setGlowActive(!glow.activeSelf);
+        SetGlowActive(!glow.activeSelf);
         
     }
 
     //,make private?
-    public void setGlowActive(bool isActive = true) {
+    public void SetGlowActive(bool isActive = true) {
 
         glow.SetActive(isActive);
 

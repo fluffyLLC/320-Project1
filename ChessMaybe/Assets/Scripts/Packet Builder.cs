@@ -28,12 +28,27 @@ public static class PacketBuilder
     }
 
 
-    public static Buffer Play(int x, int y)
+    public static Buffer Play(int currentX, int currentY, int targetX, int targetY)
     {
         //int packetLength = 5 + message.Length;
-        Buffer packet = Buffer.Alloc(6);
+        Buffer packet = Buffer.Alloc(8);
 
         packet.WriteString("PLAY");
+        packet.WriteUInt8((byte)currentX, 4);
+        packet.WriteUInt8((byte)currentY, 5);
+        packet.WriteUInt8((byte)targetX, 6);
+        packet.WriteUInt8((byte)targetY, 7);
+        //packet.WriteString(message, 5);
+
+        return packet;
+
+    }
+
+    public static Buffer Hover(int x, int y) {
+
+        Buffer packet = Buffer.Alloc(6);
+
+        packet.WriteString("HOVR");
         packet.WriteUInt8((byte)x, 4);
         packet.WriteUInt8((byte)y, 5);
         //packet.WriteString(message, 5);
