@@ -53,6 +53,7 @@ exports.Client = class Client{
 					if(responseType <= 3){
 						this.username = desiredUsername;
 					}
+					/*
 					var usernameWhite = "unknown";
 					var usernameBlack = "unknown";
 
@@ -65,6 +66,7 @@ exports.Client = class Client{
 						usernameBlack = this.server.game.clientP2.username;
 
 					}
+					*/
 					//consume data out of buffer
 					//consume(5 + lengthOfUsername);
 					this.buffer = this.buffer.slice(5 + lengthOfUsername);
