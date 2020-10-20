@@ -1,0 +1,9 @@
+Link to meshes: https://www.turbosquid.com/3d-models/free-3ds-model-blender-settings-knight/686549
+
+The models are made by user "3DinHD" under the title "Chess for free" on Turbosquid. 
+
+Music is from Ultimate Games Music collection on the unity asset store
+
+SFX are from Universal Sound FX on the unity asset store
+
+LeanTween was used in order to smooth some animations

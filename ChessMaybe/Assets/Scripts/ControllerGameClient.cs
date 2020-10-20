@@ -43,7 +43,7 @@ public class ControllerGameClient : MonoBehaviour
             singleton = this;
             DontDestroyOnLoad(gameObject); //don't destroy when you load a new scene
 
-            controllerGameplay.SwitchScreenState(ScreenState.Conection);
+            //controllerGameplay.SwitchScreenState(ScreenState.Conection);
             
         }
 
@@ -102,7 +102,7 @@ public class ControllerGameClient : MonoBehaviour
 
             try
             {
-               // print("reading");
+                print("reading");
                 int bytesRead = await socket.GetStream().ReadAsync(data, 0, maxPacketSize);
 
                 buffer.Concat(data,bytesRead);
@@ -147,10 +147,6 @@ public class ControllerGameClient : MonoBehaviour
                     inputUsername.text = "";
                     print(joinResponse);
                 }
-            
-                //TODO: change which screen we are looking at
-
-                //TODO: consume data
 
                 buffer.Consume(5);
                 break;
@@ -183,28 +179,76 @@ public class ControllerGameClient : MonoBehaviour
 
                // panelGameplay.UpdateFromServer(gameStatus, whoseTurn, spaces);
 
-                
-
-                //TODO: consume data
                 buffer.Consume(70);
 
                 break;
-            case "CHAT":
+            case "MOVE":
+                if (buffer.Length < 5) return;
 
-                if (buffer.Length <= 7) return;
+                byte errorCode = buffer.ReadUInt8(4);
+
+                switch (errorCode) {
+                    case 0:
+                        print("Move Is Legal");
+                        break;
+
+                    case 1:
+                        print("Move invalid, Move is off of the board");
+                        break;
+                    case 2:
+                        print("Move invalid, Player does not own peice");
+                        break;
+
+                    case 3:
+                        print("Move invalid, Board space Is Empty");
+                        break;
+
+                    case 4:
+                        print("Move invalid, Player is stepping on themselves");
+                        break;
+
+                    case 5:
+                        print("Move invalid, It is not the current players turn");
+                        break;
+
+                    case 6:
+                        print("Move invalid, Move is not valid for the type of peice");
+                        break;
+
+                    case 7:
+                        print("Move invalid, Path is blocked by one of the player's peices");
+                        break;
+                    case 8:
+                        print("Move invalid, Move is not valid for an unspecified reason");
+                        break;
+
+                }
+
+                
+                buffer.Consume(5);
+
+                break;
+            case "CHAT":
+                print("chat recived");
+                if (buffer.Length <= 6) return;
                 
                 byte usernameLength = buffer.ReadUInt8(4);
 
-                ushort messageLength = buffer.ReadUInt16BE(5);
+                ushort messageLength = buffer.ReadUInt8(5);
 
-                int fullPacketLength = 7 + usernameLength + messageLength;
+                int fullPacketLength = 6 + usernameLength + messageLength;
 
                 if (buffer.Length < fullPacketLength) return;
 
-                string username = buffer.ReadString(7, usernameLength);
-                string chatMessage = buffer.ReadString(7 + usernameLength, messageLength);
+                string username = buffer.ReadString(6, usernameLength);
+                string chatMessage = buffer.ReadString(6 + usernameLength, messageLength);
 
-                
+                //print(chatMessage);
+
+                string message = $"{username}: {chatMessage}\n";
+
+                controllerGameplay.AddMessageToChatDisplay(message);
+
                 //panelGameplay.gameObject.SetActive(true);
 
                 //TODO: consume data
@@ -242,6 +286,11 @@ public class ControllerGameClient : MonoBehaviour
             controllerGameplay.HoverPeice(x, y);
             buffer.Consume(6);
         }
+    }
+
+    public void Disconnect() {
+
+        socket.Close(); //.Dispose();
     }
 
     async public void SendPacketToServer(Buffer packet) {

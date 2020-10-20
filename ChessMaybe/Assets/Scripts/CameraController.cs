@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour
     float boardLength;
     float moveMod = 30;
     public bool pauseCamRig  = false;
-    Vector3 mousePositionPrev;
+    //Vector3 mousePositionPrev;
     Vector3 localRotaion = new Vector3(30,0,0);
     Vector3 localPosition;
     Vector3 localCamPostition;
@@ -86,5 +86,13 @@ public class CameraController : MonoBehaviour
            // mousePositionPrev = Input.mousePosition;
             //transform.position = new Vector3(target.position.x, target.position.y + 1, target.position.z);
         }
+
+    }
+
+    public void ChangeRotation(float x, float y, float z = 0) {
+
+        transform.rotation = Quaternion.Euler(x, y, z);
+        localRotaion = new Vector3(x, y, z);
+
     }
 }

@@ -46,25 +46,30 @@ exports.Game = {
 	},
 	movePeiceInState(currentX,currentY,targetX,targetY){
 		
-		if(currentX < 0 || currentY < 0 || targetX < 0 || targetY < 0) return false;
-		if(currentY >= this.board.length) return false;//ignore moves off the board
-		if(currentX >= this.board[currentY].length) return false;//ignore moves off the board
-		if(targetY >= this.board.length) return false;//ignore moves off the board
-		if(targetX >= this.board[targetY].length) return false;
-
-		if(this.board[currentY][currentX] == 0) return false;//return false?
-
-		if(!this.checkOwnesPeice(this.board[currentY][currentX])) return false;
-		if(!this.checkStepOnSelf(this.board[targetY][targetX])) return false;
+		
 		//ignore moves off the board
 
 
 		this.board[targetY][targetX] = this.board[currentY][currentX];
 		this.board[currentY][currentX] = 0;
 		
-		return true;
+		//return true;
 	},
+	checkMoveValid(currentX,currentY,targetX,targetY){
 
+		if(currentX < 0 || currentY < 0 || targetX < 0 || targetY < 0) return 1; // move is off the board
+		if(currentY >= this.board.length) return 1; // ignore moves off the board
+		if(currentX >= this.board[currentY].length) return 1; // ignore moves off the board
+		if(targetY >= this.board.length) return 1; // ignore moves off the board
+		if(targetX >= this.board[targetY].length) return 1; // move is off the board
+
+		if(this.board[currentY][currentX] == 0) return 3; // there is no peice on the board
+
+		if(!this.checkOwnesPeice(this.board[currentY][currentX])) return 2; //the player does not own the peice they are trying to move
+		if(!this.checkStepOnSelf(this.board[targetY][targetX])) return 4; //the player alresdy has a piece on this spot
+
+		return 0;
+	},
 	checkStepOnSelf(boardState){//return true if we can take the peice in question
 		if(boardState == 0) return true;
 		return !this.checkOwnesPeice(boardState);

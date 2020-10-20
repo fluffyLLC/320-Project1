@@ -152,82 +152,6 @@ public class Board : MonoBehaviour
         //m.sharedMaterial.color = Color.black;
     }
 
-    /*
-    private bool MovePeice(Vector2 currentPos, Vector2 targetPos) {
-        BoardSegment currentSegmant = boardSpaces[(int)currentPos.x, (int)currentPos.y].GetComponent<BoardSegment>();
-        BoardSegment targetSegmant = boardSpaces[(int)targetPos.x, (int)targetPos.y].GetComponent<BoardSegment>();
-        GameObject peice  = peices[(int)currentPos.x, (int)currentPos.y];
-
-        peice.transform.position = Vector3.Lerp(currentSegmant.snapPointPlaced.position, targetSegmant.snapPointPlaced.position, 1);
-
-        if (peice.transform.position == targetSegmant.snapPointPlaced.position) {
-            
-            return true;
-
-        }
-        else {
-
-            return false;
-
-        }
-
-    }
-    
-    private bool HoverPeice(Vector2 currentPos, Vector2 peiceIndex)
-    {
-        BoardSegment currentSegmant = boardSpaces[(int)currentPos.x, (int)currentPos.y].GetComponent<BoardSegment>();
-        //BoardSegment targetSegmant = board[(int)targetPos.x, (int)targetPos.y].GetComponent<BoardSegment>();
-        GameObject peice = peices[(int)currentPos.x, (int)currentPos.y];
-
-        peice.transform.position = Vector3.Lerp(currentSegmant.snapPointPlaced.position, currentSegmant.snapPointHover.position, 1);
-
-        if (peice.transform.position == currentSegmant.snapPointHover.position)
-        {
-
-            return true;
-
-        }
-        else
-        {
-
-            return false;
-
-        }
-
-
-    }
-    private bool EndHoverPeice(Vector2 currentPos, Vector2 peiceIndex)
-    {
-        BoardSegment currentSegmant = boardSpaces[(int)currentPos.x, (int)currentPos.y].GetComponent<BoardSegment>();
-        //BoardSegment targetSegmant = board[(int)targetPos.x, (int)targetPos.y].GetComponent<BoardSegment>();
-        GameObject peice = peices[(int)currentPos.x, (int)currentPos.y];
-
-        peice.transform.position = Vector3.Lerp(currentSegmant.snapPointHover.position, currentSegmant.snapPointPlaced.position, 1);
-
-        if (peice.transform.position == currentSegmant.snapPointHover.position)
-        {
-
-            return true;
-
-        }
-        else
-        {
-
-            return false;
-
-        }
-
-
-    }
-    */
-
-    /*private Vector3 LerpPeice(Vector3 currentPos, Vector3 targetPos)
-    { 
-    
-    
-    
-    }*/
-
     public bool HandleMove(byte[] updatedState) {
         Vector2 currentIndex = new Vector2(-1, -1);
         Vector2 targetIndex = new Vector2(-1,-1);
@@ -242,12 +166,14 @@ public class Board : MonoBehaviour
             {
                 if (updatedState[i] != (int)boardSpaces[x, y].GetComponent<BoardSegment>().state)
                 {
+
                     currentIndex = new Vector2(x, y);
 
                 }
             }
             else {
                 if (updatedState[i] != (int)boardSpaces[x, y].GetComponent<BoardSegment>().state) {
+
                     targetIndex = new Vector2(x, y);   
                 
                 }
@@ -266,17 +192,30 @@ public class Board : MonoBehaviour
 
         if (OccupiedByEnemey(targetSegmant.state, futureState)) {
 
-            Destroy(peices[(int)targetIndex.x, (int)targetIndex.y]);
-            peices[(int)targetIndex.x, (int)targetIndex.y] = null;
-
+            
+            GameObject p = peices[(int)targetIndex.x, (int)targetIndex.y];
+            if (p != null)
+            {
+                peices[(int)targetIndex.x, (int)targetIndex.y] = null;
+                //print("DESTROYING");
+                Destroy(p);
+            }
+            else {
+                //print("alwats null");
+                return false;
+            }
         }
 
-        //move peices
-        peices[(int)currentIndex.x, (int)currentIndex.y].GetComponent<PlayerPeice>().MovePeice(targetSegmant.snapPointHover.position, targetSegmant.snapPointPlaced.position); // transform.position = targetSegmant.snapPointPlaced.position;//TODO: Animate Move
+        //move peices on gameboard
+        peices[(int)currentIndex.x, (int)currentIndex.y].GetComponent<PlayerPeice>().MovePeice(targetSegmant.snapPointHover.position, targetSegmant.snapPointPlaced.position);
+
 
         //update gamestate
         peices[(int)targetIndex.x, (int)targetIndex.y] = peices[(int)currentIndex.x, (int)currentIndex.y];
         peices[(int)currentIndex.x, (int)currentIndex.y] = null;
+
+        peices[(int)targetIndex.x, (int)targetIndex.y].GetComponent<PlayerPeice>().acessIndex = targetIndex;
+
         boardSpaces[(int)targetIndex.x, (int)targetIndex.y].GetComponent<BoardSegment>().state = boardSpaces[(int)currentIndex.x, (int)currentIndex.y].GetComponent<BoardSegment>().state;
         boardSpaces[(int)currentIndex.x, (int)currentIndex.y].GetComponent<BoardSegment>().state = SegmentOccupationState.Empty;
 

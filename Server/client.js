@@ -6,7 +6,7 @@ exports.Client = class Client{
 		constructor(socket, server){
 			this.socket = socket;
 			this.server = server;
-			this.username = "";
+			this.username = "Unknown";
 
 			this.buffer = Buffer.alloc(0);
 
@@ -28,14 +28,14 @@ exports.Client = class Client{
 
 		onData(data){
 			this.buffer = Buffer.concat([this.buffer,data]);
-			//console.log(this.buffer);
-			//console.log("data recived");
+			console.log(this.buffer);
+			console.log("data recived");
 
 			if(this.buffer.length < 4) return; // not enough data
 
 			const packetIdentifier = this.buffer.slice(0,4).toString();
 
-			//console.log("packet identifyer: " + packetIdentifier);
+			console.log("packet identifyer: " + packetIdentifier);
 
 			switch(packetIdentifier){
 				case "JOIN": 
@@ -50,6 +50,21 @@ exports.Client = class Client{
 
 					this.sendPacket(packet);
 
+					if(responseType <= 3){
+						this.username = desiredUsername;
+					}
+					var usernameWhite = "unknown";
+					var usernameBlack = "unknown";
+
+					if(this.server.game.clientP1){
+						usernameWhite = this.server.game.clientP1.username;
+
+					}
+
+					if(this.server.game.clientP2){
+						usernameBlack = this.server.game.clientP2.username;
+
+					}
 					//consume data out of buffer
 					//consume(5 + lengthOfUsername);
 					this.buffer = this.buffer.slice(5 + lengthOfUsername);
@@ -58,7 +73,22 @@ exports.Client = class Client{
 					//check username
 
 				break;
-				case "CHAT": break;
+				case "CHAT": 
+					if(this.buffer.length < 6) return;
+					const mLength = this.buffer.readUInt8(4);
+					console.log(mLength);
+					//const mLength = this.buffer.readUInt8(5);
+
+					if(this.buffer.length < 5 + mLength) return;
+					var message = this.buffer.toString('utf8',5,5 + mLength) //.slice(4,mLength);
+
+					this.server.broadcastToAll(PacketBuilder.chat(this.username,message));
+
+					this.buffer = this.buffer.slice(5 + mLength);
+					//this.username
+
+
+				break;
 				case "PLAY": 
 					if(this.buffer.length < 8) return;
 
@@ -67,10 +97,16 @@ exports.Client = class Client{
 					const targetX = this.buffer.readUInt8(6);
 					const targetY = this.buffer.readUInt8(7);
 
-					//TODO: decouple move & turn checks from data mod and return an error number for invalid moves
-					if(this.server.game.movePeiceInState(currentX,currentY,targetX,targetY)) {
+					let moveCode = this.server.game.checkMoveValid(currentX,currentY,targetX,targetY);
 
+
+					//TODO: decouple move & turn checks from data mod and return an error number for invalid moves
+					if(moveCode == 0) {
+
+						this.server.game.movePeiceInState(currentX,currentY,targetX,targetY);
+						this.server.game.toggleTurn();
 						this.server.broadcastToAll(PacketBuilder.update(this.server.game));
+
 
 					}
 
@@ -92,7 +128,7 @@ exports.Client = class Client{
 					//TODO:Impliment Bitmask
 					if(this.server.game.isClientTurn(this) && this.server.game.checkOwnesPeice(this.server.game.board[y][x])){
 						//console.log(this.server.game.board[y][x]);
-						this.server.broadcastToAll(PacketBuilder.hover(x,y));
+						this.server.broadcastToAllExcept(PacketBuilder.hover(x,y),this)
 
 					}
 
@@ -113,7 +149,7 @@ exports.Client = class Client{
 		}
 
 		sendPacket(packet){
-			//console.log("sending packet: " + packet);
+			console.log("sending packet: " + packet);
 			this.socket.write(packet);
 		}
 

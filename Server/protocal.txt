@@ -9,41 +9,94 @@ Whatneeds to be stores on the server?
 
 Packets from server
 -------------------
-
-JOIN (response)(placeholder) - When the server recives a JOIN packet, it must decide wether or not the clinet is allowed to join.
+NAME - (response) - it must decide wether or not toa accept a username
 
 	O	L	Datatype	Desc
 	-------------------------------------------------------
-	0	4	ascii		packet type: "JOIN"
-	4	1	uint8		join response (see below)
+	0	4	ascii		packet type: "NAME"
+	4	1	uint8		name response (see below)
 
-	join response
-	---------------------------------------
-	1: player 1
-	2: player 2
-	3: spectator
+ 	name response
+ 	-----------------------
+	1:accepted
 	(denied:)
 	4: username to short
 	5: username too long
 	6: username has invalid characcters
 	7: username already taken
 	8: username not allowed
-	9: game is full
 
 
-// MOVE (response) - sent if the player makes an invalid move
+JOIN - () - When the server recives a JOIN packet, 
+
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ascii		packet type: "JOIN"
+	4	1	uint8		join response (see below)
+	5	1	uint8		length of the username p1
+	6	1	uint8		length of the username p2
+	?	?	string		username p1
+	?	?	string		username p2
+	?	1	uint8		includesinital board (0= false, 1 = true)
+	?	64	uint8 x64	the board state (see update)
+
+
+	join response
+	---------------------------------------
+	1: player 1
+	2: player 2
+	3: spectator
+	4: game is full
 
 
 
+MOVE (response) - sent after the player makes a
 
-HOVR (response) - return the valid move set for the peice the player is hovering over
+	O	L	Datatype	Desc
+	-------------------------------------------
+	0	4	ascii		packet type: "MOVE"
+	4	1	uint8		Error Code (see Below)
+	
+	Move Error Code
+	--------------------------
+	0: Move is legal (this should never be sent in a packet, an update packet will be sent if a move is legal)
+	1: Move is off of the board
+	2: Player does not own peice
+	3: Board space Is Empty
+	4: Player is stepping on themselves (the target space is occupied by the a different peice owned by the current player) 
+	5: It is not the current players turn
+	6: Move is not valid for the type of peice
+	7: Path is blocked by one of the player's peices
+	8: Other 
+
+
+
+HOVR (broadcast) - return the valid move set for the peice the player is hovering over
+
 	O	L	Datatype	Desc
 	-------------------------------------------
 	0	4	ascii		packet type: "HOVR"
 	4	1	uint8		x of the hovering p
 	5	1	uint8		y of the hovering p
+
+	ToDo:
 	6   8   uint8 x8    Valid moveset for the peice in consideration. Will not be sent if sending it to spectators
 						or the inactive player
+
+CHEK (response) - 
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"CHEK"
+
+CKMT (response) - 
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"CKMT"
+
+UNDO (response) - 
+O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"UNDO"
 
 	
 UPDT (in progress)- The state of the game
@@ -53,7 +106,6 @@ UPDT (in progress)- The state of the game
 	0	4	ascii		packet type: "UPDT"
 	4	1	uint8		whose turn (1/2)
 	5	1	uint8		victory state (seebelow)
-
 	6	64	uint8 x64	the board state (seebelow)
 
 	who's won
@@ -92,6 +144,8 @@ CHAT (placeHolder)- when reciving a chat packet from a client the server sends t
 	0	4	ASCII		packet type: "Chat"
 	4	1	uint8		length of the username
 	5	2	Uint16		length of the chat messege
+	6	?	string		username
+	?	?	string		message
 
 
 			
@@ -125,7 +179,7 @@ HOVR - This packet is submitted when a player hovers their mouse over a chess pe
 	
 
 
-PLAY - This packet should be submitted when the player takes their turn
+PLAY (should be "MOVE") - This packet should be submitted when the player takes their turn
 	
 	O	L	DATATYPE	DESC
 	-----------------------------------------------------
@@ -137,21 +191,35 @@ PLAY - This packet should be submitted when the player takes their turn
 	//8	1	uint8		Packet Validator
 		
 
-/*
+PASS - the players turn is over
+	
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"PASS"
 
 CHEK -
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"CHEK"
 
 CKMT - 
+	O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"CKMT"
 
-*/
+UNDO - 
+O	L	DATATYPE	DESC
+	-----------------------------------------------------
+	0	4	ASCII		packet type:"UNDO"
+
+
 
 CHAT - the player wants to chat.
 	
 	O	L	Datatype	Desc
 	-----------------------------------------------------
 	0	4	ASCII		packet type: "CHAT"
-	4	1	uint16		length of messege(255 max)
+	4	1	uint8		length of messege(255 max)
 	6	?	ASCII		messege for the chat	
-	//?	1	uint8		Packet Validator	
-
+	
 

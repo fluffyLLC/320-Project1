@@ -31,7 +31,7 @@ exports.Server = { //we can use js object notation too
 	},
 
 	onClientConnect(socket){
-		console.log("new connection from " + socket.localAddress);
+		//console.log("new connection from " + socket.localAddress);
 
 		if(this.isServerFull()){
 
@@ -54,14 +54,26 @@ exports.Server = { //we can use js object notation too
 	}, 
 
 	onStartLitsen(){
-		console.log("the server is now listening for connections on port" + this.port);
+		console.log("the server is now listening for connections on port " + this.port);
 
 	},
 
 	onClientDisonnect(client){
 		const index = this.clients.indexOf(client); //find object in array
-		if(index >= 0) this.clients.splice(index,1); //remove object from array
 
+		if(index >= 0) this.clients.splice(index,1); //remove object from array
+/*
+		if(client == game.clientP1){
+
+			clientP1 = this.clients[1];
+			this.client[1].sendPacket(PacketBuilder.join())
+
+		}else if(client == game.clientP2){
+
+			clientP2 = this.clients[1];
+
+		}
+*/
 
 	},
 	
@@ -70,7 +82,7 @@ exports.Server = { //we can use js object notation too
 		return(this.clients.length >= this.maxConnectedUsers);
 	},
 	//this funcction returns a response ID
-	getUsernameResponse(desiredUsername, client){
+	getUsernameResponse(desiredUsername, client){ //TODO: Decouple setting Username and Joining
 		//let responseType = 1;
 
 
@@ -121,6 +133,14 @@ exports.Server = { //we can use js object notation too
 			//if(c.username){
 				c.sendPacket(packet);
 			//}
+		});
+
+	},broadcastToAllExcept(packet,client){
+		this.clients.forEach(c=>{
+			//console.log("broadcasting:" + packet);
+			if(c != client){
+				c.sendPacket(packet);
+			}
 		});
 
 	},
