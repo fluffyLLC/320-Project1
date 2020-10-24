@@ -28,7 +28,7 @@ exports.Client = class Client{
 
 		onData(data){
 			this.buffer = Buffer.concat([this.buffer,data]);
-			console.log(this.buffer);
+			//console.log(this.buffer);
 			console.log("data recived");
 
 			if(this.buffer.length < 4) return; // not enough data
@@ -68,9 +68,8 @@ exports.Client = class Client{
 
 
 					if(desiredRole == 0){
-						console.log("0 desired");
+						//console.log("0 desired");
 						 this.sendPacket(PacketBuilder.init(0,false,this.server.game));
-
 						 this.buffer = this.buffer.slice(5);
 
 						 return;
@@ -82,7 +81,7 @@ exports.Client = class Client{
 						this.role = 2;
 						this.server.game.clientP2 = this;
 
-					}else{//todo check if the client is already set to p1 or p2 before doing anything else
+					}else{//todo: check if the client is already set to p1 or p2 before doing anything else
 						this.role = 3;
 
 					}

@@ -62,7 +62,7 @@ exports.PacketBuilder = {
 			const gbState = this.getBoardStatePacket(game);
 			packet = Buffer.concat([firstHalf,gbState],firstHalfLength+64);
 		}else{
-			console.log("not including board");
+			//console.log("not including board");
 			//write "includes inital board"
 			firstHalf.writeUInt8(0,7);
 			//console.log(firstHalf.readUInt8(7));

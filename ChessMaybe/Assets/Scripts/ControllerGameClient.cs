@@ -69,8 +69,12 @@ public class ControllerGameClient : MonoBehaviour
         {
 
             await socket.ConnectAsync(host, port); // neeed async to use the await keyword
-            StartRecevingPackets();
-            controllerGameplay.SwitchScreenState(ScreenState.Username);
+
+            if (socket.Connected)
+            {
+                StartRecevingPackets();
+                controllerGameplay.SwitchScreenState(ScreenState.Username);
+            }
 
         }
         catch (Exception e) {
@@ -102,7 +106,7 @@ public class ControllerGameClient : MonoBehaviour
 
             try
             {
-                print("reading");
+                //print("reading");
                 int bytesRead = await socket.GetStream().ReadAsync(data, 0, maxPacketSize);
 
                 buffer.Concat(data,bytesRead);
@@ -134,6 +138,7 @@ public class ControllerGameClient : MonoBehaviour
                 byte joinResponse = buffer.ReadUInt8(4);
 
                 if (joinResponse > 0) {
+                    print("switching to username via join");
                     SendInitPacket(0);
                     controllerGameplay.SwitchScreenState(ScreenState.Username);
 
@@ -163,7 +168,7 @@ public class ControllerGameClient : MonoBehaviour
                 buffer.Consume(5);
                 break;
             case "INIT":
-                print("initrecieved");
+                //print("initrecieved");
 
                 if (buffer.Length < 8) return;
 
@@ -172,7 +177,9 @@ public class ControllerGameClient : MonoBehaviour
                 byte p2NmL = buffer.ReadUInt8(6);
                 byte includesInitGmbrd = buffer.ReadUInt8(7);
 
-                int expectedLength = 8 + p2NmL + p2NmL;
+                int expectedLength = 8 + p1NmL + p2NmL;
+
+                print("expectedLength first Half = " + expectedLength);
 
                 expectedLength += (includesInitGmbrd > 0) ? 64 : 0;
 
@@ -199,7 +206,9 @@ public class ControllerGameClient : MonoBehaviour
 
                 controllerGameplay.ProcessInit();
 
-                //todo:this number si wrong somehow
+                print("expectedLength Before Consumption = " + expectedLength);
+
+                
                 buffer.Consume(expectedLength);
                 break;
             case "UPDT":
@@ -314,7 +323,7 @@ public class ControllerGameClient : MonoBehaviour
 
                 break;
             default:
-                print("unknown packet identifyer...");
+                print("unknown packet identifyer... \n" + packetIdentifier);
 
                 buffer.Clear();
 

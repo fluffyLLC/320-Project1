@@ -31,20 +31,23 @@ public class LobbyUI : MonoBehaviour
     }
 
     public void UpdateState(string p1Username, string p2Username, int playerRole) {
-        print("we got" + p1Username + ", " + p2Username + ", " + playerRole);
+       // print("we got" + p1Username + ", " + p2Username + ", " + playerRole);
         if (p1Username == "none" && p2Username == "none" && playerRole < 3) return;
         int quedPlayers = 0;
 
 
         if (p1Username != "none") {
-            joinAsWhite.interactable = false;
+            //joinAsWhite.interactable = false;
+            joinAsWhite.enabled = false;
             joinAsWhiteText.text = $"White is {p1Username}";
             quedPlayers++;
             if (playerRole == 1) {
+
                 joinAsBlack.interactable = false;
                 joinAsBlackText.text = "Waiting For Player";
                 joinAsSpectator.interactable = false;
                 joinAsSpectatorText.text = "";
+
             }
         }
 
@@ -60,6 +63,7 @@ public class LobbyUI : MonoBehaviour
                 joinAsBlackText.text = "Waiting For Player";
                 joinAsSpectator.interactable = false;
                 joinAsSpectatorText.text = "";
+
             }
 
         }
@@ -73,7 +77,7 @@ public class LobbyUI : MonoBehaviour
                 joinAsWhiteText.text = "Waiting For Player";
             }
 
-            print("running on 3");
+            //print("running on 3");
 
             joinAsBlack.interactable = false;
             joinAsWhite.interactable = false;

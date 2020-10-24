@@ -90,7 +90,7 @@ exports.Server = { //we can use js object notation too
 		//let responseType = 1;
 
 
-		if(desiredUsername.length <= 4) return 4; //username too short
+		if(desiredUsername.length < 3) return 4; //username too short
 		if(desiredUsername.length > 15) return 5; //username too long
 					//letters (upperandlower)
 					//spaces
