@@ -27,30 +27,40 @@ NAME - (response) - it must decide wether or not toa accept a username
 	8: username not allowed
 
 
-JOIN - () - When the server recives a JOIN packet, 
+INIT - (response) - When a new client connects the server sends an join packet in response
+
 
 	O	L	Datatype	Desc
 	-------------------------------------------------------
-	0	4	ascii		packet type: "JOIN"
-	4	1	uint8		join response (see below)
+	0	4	ascii		packet type: "INIT"
+	4	1	uint8		role response (see below)
 	5	1	uint8		length of the username p1
 	6	1	uint8		length of the username p2
-	?	?	string		username p1
+	7	1	uint8		includes inital board (0= false, 1 = true)
+	8	?	string		username p1
 	?	?	string		username p2
-	?	1	uint8		includesinital board (0= false, 1 = true)
+
 	?	64	uint8 x64	the board state (see update)
 
 
-	join response
+	role response
 	---------------------------------------
 	1: player 1
 	2: player 2
 	3: spectator
-	4: game is full
 
 
 
-MOVE (response) - sent after the player makes a
+JOIN - () - When a new client connects teh server sends a join packet in response
+
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ascii		packet type: "JOIN"
+	4	1	uint8		join response (1 = join sucessful, 0 = join unsuccessfull)
+
+
+
+MOVE (response) - sent after the player makes an invalid move
 
 	O	L	Datatype	Desc
 	-------------------------------------------
@@ -68,6 +78,8 @@ MOVE (response) - sent after the player makes a
 	6: Move is not valid for the type of peice
 	7: Path is blocked by one of the player's peices
 	8: Other 
+
+
 
 
 
@@ -149,7 +161,7 @@ CHAT (placeHolder)- when reciving a chat packet from a client the server sends t
 
 
 			
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 
 
@@ -158,7 +170,7 @@ CHAT (placeHolder)- when reciving a chat packet from a client the server sends t
 Packets from Client
 -------------------
 
-JOIN (request) (placeHolder) - after establishing a connection w/the server, clinet will send a JOIN packet w/ a desired username. The server will send back a response.
+NAME (request) (placeHolder) - after establishing a connection w/the server, clinet will send a JOIN packet w/ a desired username. 	The server will send back a response.
 
 
 	O	L	Datatype	Desc
@@ -166,7 +178,6 @@ JOIN (request) (placeHolder) - after establishing a connection w/the server, cli
 	0	4	ASCII		packet type "JOIN"
 	4	1	uint8		howlong teh username is (255 max)
 	5	?	ascii		the desired username	
-	//?	1	uint8		Packet Validator
 
 
 HOVR - This packet is submitted when a player hovers their mouse over a chess peice
@@ -176,7 +187,14 @@ HOVR - This packet is submitted when a player hovers their mouse over a chess pe
 	0	4	ASCII		packet type "HOVR"
 	4	1	uint8		colom number of the peice the player is hovering over
 	5	1	uint8		row number of the peice the player is hovering over
-	
+
+
+INIT - submitted from the Lobby or "Player Left" panel to set the players desired roll
+
+	O	L	Datatype	Desc
+	-------------------------------------------------------
+	0	4	ASCII		packet type "INIT"
+	4	1	uint8		Desired player Roll
 
 
 PLAY (should be "MOVE") - This packet should be submitted when the player takes their turn
@@ -188,7 +206,6 @@ PLAY (should be "MOVE") - This packet should be submitted when the player takes 
 	5	1	uint8		row number of peice being moved
 	6	1	uint8		colom number of the peices target location
 	7	1	uint8		row number of the peices target location
-	//8	1	uint8		Packet Validator
 		
 
 PASS - the players turn is over

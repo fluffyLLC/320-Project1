@@ -10,6 +10,71 @@ exports.PacketBuilder = {
 
 		return packet;
 	},
+	name(responseID){
+		const packet = Buffer.alloc(5);
+		packet.write("NAME",0);
+		packet.writeUInt8(responseID,4);
+		return packet
+
+	},init(roleResponse,includeInitGB,game){
+		var p1Username;
+		var p2Username;
+
+		if(game.clientP1){
+			p1Username = game.clientP1.username;
+
+		}else{
+			p1Username = "none";
+
+		}
+
+
+		if(game.clientP2){
+			p2Username = game.clientP2.username;
+
+		}else{
+			p2Username = "none";
+
+		}
+
+
+
+		let firstHalfLength = 8+p1Username.length+p2Username.length;
+		let packet;
+
+		const firstHalf = Buffer.alloc(firstHalfLength);
+
+		firstHalf.write("INIT",0);
+		//console.log(roleResponse);
+		firstHalf.writeUInt8(roleResponse,4);
+		//console.log(p1Username.length);
+		firstHalf.writeUInt8(p1Username.length,5);
+		//console.log(p2Username.length);
+		firstHalf.writeUInt8(p2Username.length,6);
+
+		firstHalf.write(p1Username,8);
+		firstHalf.write(p2Username,8+p1Username.length);
+
+
+		if(includeInitGB){
+			//console.log("including board");
+			firstHalf.writeUInt8(1,7);//write "includes inital board"
+			const gbState = this.getBoardStatePacket(game);
+			packet = Buffer.concat([firstHalf,gbState],firstHalfLength+64);
+		}else{
+			console.log("not including board");
+			//write "includes inital board"
+			firstHalf.writeUInt8(0,7);
+			//console.log(firstHalf.readUInt8(7));
+			packet = firstHalf;//Buffer.concat([firstHalf],firstHalfLength);
+		}
+
+
+
+
+
+		return packet;
+	},
 	chat(username,message){
 		let usernameLength = username.length;
 		let messageLength = message.length; 
@@ -38,24 +103,16 @@ exports.PacketBuilder = {
 		return packet;
 	},
 	update(game){
-		const packet = Buffer.alloc(70);
-		packet.write("UPDT",0);
-		packet.writeUInt8(game.whoseTurn,4);
-		packet.writeUInt8(game.whoHasWon,5);
+		// Buffer.alloc(70);
 
-		let offset = 6;
+		const firstHalf = Buffer.alloc(6);
+		firstHalf.write("UPDT",0);
+		firstHalf.writeUInt8(game.whoseTurn,4);
+		firstHalf.writeUInt8(game.whoHasWon,5);
 
-
-		for(let y = 0; y < game.board.length;y++ ){
-
-			for(let x = 0; x < game.board[y].length;x++ ){
-				
-				packet.writeUInt8(this.boardStateToNum(game.board[y][x]),offset);
-				
-				offset++;
-
-			}			
-		}
+		
+		const packet = Buffer.concat([firstHalf,this.getBoardStatePacket(game)],70);
+		
 
 		return packet;
 
@@ -67,7 +124,28 @@ exports.PacketBuilder = {
 		packet.writeUInt8(y,5);
 
 		return packet;
-	},boardStateToNum(boardState){
+	},
+	getBoardStatePacket(game){
+
+		const packet = Buffer.alloc(64);
+		let offset = 0;
+
+		for(let y = 0; y < game.board.length;y++ ){
+
+				for(let x = 0; x < game.board[y].length;x++ ){
+				
+					packet.writeUInt8(this.boardStateToNum(game.board[y][x]),offset);
+				
+					offset++;
+
+			}			
+		}
+
+		return packet;
+
+	},
+
+	boardStateToNum(boardState){
 
 		switch(boardState){
 			case 0:

@@ -4,16 +4,31 @@ using UnityEngine;
 
 public static class PacketBuilder 
 {
-    public static Buffer Join(string username) {
+
+    public static Buffer Name(string username) {
         int packetLength = 5 + username.Length;
         Buffer packet = Buffer.Alloc(packetLength);
 
-        packet.WriteString("JOIN");
+        packet.WriteString("NAME");
         packet.WriteUInt8((byte)username.Length, 4);
         packet.WriteString(username, 5);
 
         return packet;
     }
+
+
+    public static Buffer Init(int desiredRole) {
+
+        //int packetLength = 5 + username.Length;
+        Buffer packet = Buffer.Alloc(5);
+
+        packet.WriteString("INIT");
+        packet.WriteUInt8((byte)desiredRole, 4);
+        //packet.WriteString(username, 5);
+
+        return packet;
+    }
+
 
     public static Buffer Chat(string message) {
         int packetLength = 5 + message.Length;
@@ -43,8 +58,6 @@ public static class PacketBuilder
         return packet;
 
     }
-
-
 
 
     public static Buffer Hover(int x, int y) {

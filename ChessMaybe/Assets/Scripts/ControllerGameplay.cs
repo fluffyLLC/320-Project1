@@ -8,6 +8,7 @@ public enum ScreenState
     Conection,
     Username,
     Game,
+    Lobby,
 
 }
 
@@ -24,39 +25,47 @@ public class ControllerGameplay : MonoBehaviour
 
     public Transform paneHostDetails;
     public Transform panelUsername;
+    public Transform panelLobby;
     public Transform playUITransform;
 
 
     public PlayUI playUI;
-    public int playerState; // are we player 1 player 2 or a spectator (1, 2, and 3 respectivly)
+    public LobbyUI lobbyUI;
+
+    public int playerState = 0; // are we player 1 player 2 or a spectator (1, 2, and 3 respectivly)
     public bool peiceSelected = false;
     public bool isMyTurn = false;
+
     PlayerPeice peice;
+
+    public string p1Username = "none";
+    public string p2Username = "none";
     //BoardSegment segment;
 
-    Vector2 selectedPeice = new Vector2(-1,-1);
+    Vector2 selectedPeice = new Vector2(-1, -1);
     //bool preformingMove;
 
     // Start is called before the first frame update
     void Start()
     {
-       SwitchScreenState(ScreenState.Conection);
+        SwitchScreenState(ScreenState.Conection);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (playerState == 0) return;
         //print(playerState);
         if (screenState == ScreenState.Game && playerState != 3)
         {
             //print("Looping");
             if (!Input.GetMouseButton(2) || !Input.GetMouseButton(1))//if we're not using the camera
             {
-                
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     HandleSelection();
-                    
+
 
                 }
             }//aren't using camera controlls
@@ -66,6 +75,7 @@ public class ControllerGameplay : MonoBehaviour
             ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Hover((int)peice.acessIndex.x, (int)peice.acessIndex.y));
             HoverPeice((int)peice.acessIndex.x, (int)peice.acessIndex.y);
         }
+
     }//update
 
     private void HandleSelection()
@@ -100,7 +110,7 @@ public class ControllerGameplay : MonoBehaviour
 
                 }
 
-                
+
 
             }
             else {
@@ -128,15 +138,15 @@ public class ControllerGameplay : MonoBehaviour
                     }
 
                 }
-                else if(peiceSelected) { //we have a piece selected and we are clicking on the opponents peice
+                else if (peiceSelected) { //we have a piece selected and we are clicking on the opponents peice
 
                     SendMoveToServer((int)p.acessIndex.x, (int)p.acessIndex.y);
-                                    
+
                 }
 
 
             }
-            else if(peiceSelected && b){ //we have selected a segmant and we have a piece selected
+            else if (peiceSelected && b) { //we have selected a segmant and we have a piece selected
 
                 SendMoveToServer(b.pos.indexX, b.pos.indexY);
 
@@ -155,7 +165,7 @@ public class ControllerGameplay : MonoBehaviour
             }
             //Debug.Log(peice.peiceType + " " + peice.owner);
             */
-           
+
 
 
         }
@@ -182,7 +192,7 @@ public class ControllerGameplay : MonoBehaviour
         }
         else
         {
-            
+
             if (segment)
             {
 
@@ -190,7 +200,7 @@ public class ControllerGameplay : MonoBehaviour
                 {
                     this.peice = Board.peices[segment.pos.indexX, segment.pos.indexY].GetComponent<PlayerPeice>();
                 }
-               
+
 
                 if (this.peice)
                 {
@@ -203,9 +213,9 @@ public class ControllerGameplay : MonoBehaviour
 
                 }
             }
-            
+
             //return false;
-             
+
         }
 
         return false;
@@ -228,9 +238,9 @@ public class ControllerGameplay : MonoBehaviour
 
         PlayerPeice peice = Board.peices[x, y].GetComponent<PlayerPeice>();
         Vector3 hoverTarget = Board.boardSpaces[x, y].GetComponent<BoardSegment>().snapPointHover.position;
-        
+
         peice.HoverUp(hoverTarget);
-        
+
     }
 
     public void ProcessUpdate(int gameStatus, int whoseTurn, byte[] spaces) {
@@ -238,17 +248,17 @@ public class ControllerGameplay : MonoBehaviour
         if (gameBoard.HandleMove(spaces)) {
             peiceSelected = false;
             peice = null;
-           // segment = null;
+            // segment = null;
         }
 
-        
+
     }
 
 
     public void SendChat(string message) {
 
         ControllerGameClient.singleton.SendPacketToServer(PacketBuilder.Chat(message));
-    
+
     }
 
     public void ReturnToConnection() {
@@ -261,6 +271,14 @@ public class ControllerGameplay : MonoBehaviour
         playUI.AddMessageToChat(message);
     }
 
+    public void ProcessInit() {
+        playUI.whiteUserDisplay.text = $"White is {p1Username}";
+        playUI.blackUserDisplay.text = $"Black is {p2Username}";
+        lobbyUI.UpdateState(p1Username, p2Username, playerState);
+    
+    }
+
+
     public void SwitchScreenState(ScreenState state)
     {
         switch (state)
@@ -269,6 +287,7 @@ public class ControllerGameplay : MonoBehaviour
                 screenState = ScreenState.Conection;
                 paneHostDetails.gameObject.SetActive(true);
                 panelUsername.gameObject.SetActive(false);
+                panelLobby.gameObject.SetActive(false);
                 playUITransform.gameObject.SetActive(false);
                 gameBoard.DeconstructBoard();
                 cameraController.pauseCamRig = true;
@@ -277,6 +296,17 @@ public class ControllerGameplay : MonoBehaviour
                 screenState = ScreenState.Username;
                 paneHostDetails.gameObject.SetActive(false);
                 panelUsername.gameObject.SetActive(true);
+                panelLobby.gameObject.SetActive(false);
+                playUITransform.gameObject.SetActive(false);
+                gameBoard.DeconstructBoard();
+                cameraController.pauseCamRig = true;
+                break;
+            case ScreenState.Lobby:
+                screenState = ScreenState.Username;
+                paneHostDetails.gameObject.SetActive(false);
+                panelUsername.gameObject.SetActive(false);
+                panelLobby.gameObject.SetActive(true);
+                //ProcessInit();
                 playUITransform.gameObject.SetActive(false);
                 gameBoard.DeconstructBoard();
                 cameraController.pauseCamRig = true;
@@ -285,8 +315,9 @@ public class ControllerGameplay : MonoBehaviour
                 screenState = ScreenState.Game;
                 paneHostDetails.gameObject.SetActive(false);
                 panelUsername.gameObject.SetActive(false);
+                panelLobby.gameObject.SetActive(false);
                 playUITransform.gameObject.SetActive(true);
-                gameBoard.BuildBoard();
+                //gameBoard.BuildBoard();
                 if (playerState == 2)
                 {
                     cameraController.ChangeRotation(30, 180);

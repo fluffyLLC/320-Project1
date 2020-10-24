@@ -43,6 +43,7 @@ exports.Game = {
 		if(this.whoseTurn == 2 && client == this.clientP2) return true;
 
 		return false;
+		
 	},
 	movePeiceInState(currentX,currentY,targetX,targetY){
 		

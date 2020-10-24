@@ -19,15 +19,16 @@ one posibility
 exports.Server = { //we can use js object notation too
 	port:320,
 	clients:[],
-	maxConnectedUsers:8,
+	maxConnectedUsers:15,
 	start(game){
 
 		this.game = game;
 		
 		this.socket = require("net").createServer({}, c=>this.onClientConnect(c));
-		this.socket.on("error", e=>this.onError(e))
+		this.socket.on("error", e=>this.onError(e));
 		this.socket.listen({port:this.port},()=>this.onStartLitsen());
-		this.socket.on("close", e=>this.onClientDisonnect(e))
+		this.socket.on("close", e=>this.onClientDisonnect(e));
+
 	},
 
 	onClientConnect(socket){
@@ -35,7 +36,8 @@ exports.Server = { //we can use js object notation too
 
 		if(this.isServerFull()){
 
-			const packet = PacketBuilder.join(9); // rejected, server full
+			const packet = PacketBuilder.join(0); // rejected, server full
+			console.log("Server Full");
 
 			socket.end(packet);// end connection with client
 
@@ -43,7 +45,9 @@ exports.Server = { //we can use js object notation too
 			//instantiate new client
 
 			const client = new Client(socket,this);
+
 			this.clients.push(client);
+			console.log(`client ${this.clients.length} has joined`);
 		}
 
 	},
@@ -59,9 +63,9 @@ exports.Server = { //we can use js object notation too
 	},
 
 	onClientDisonnect(client){
-		const index = this.clients.indexOf(client); //find object in array
+		//const index = this.clients.indexOf(client); //find object in array
 
-		if(index >= 0) this.clients.splice(index,1); //remove object from array
+		//if(index >= 0) this.clients.splice(index,1); //remove object from array
 /*
 		if(client == game.clientP1){
 
@@ -108,6 +112,9 @@ exports.Server = { //we can use js object notation too
 
 		if(isUsernameTaken) return 7;
 
+		return 1;
+
+		/*
 		if(this.game.clientP1 == client) return 1; //you are already p1
 		
 		if(this.game.clientP2 == client) return 2; //you are already p2
@@ -123,8 +130,8 @@ exports.Server = { //we can use js object notation too
 		 	return 2; //you are now p2
 		}
 		
-
 		return 3; //Spectator
+		*/
 
 	},
 	broadcastToAll(packet){

@@ -13,8 +13,8 @@ public class NewBehaviourScript : Editor
 
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Build Board")) {
-            board.BuildBoard();
+        if (GUILayout.Button("Build Board (dissabled)")) {
+            //board.BuildBoard();
         }
 
         if (GUILayout.Button("Destroy Board"))

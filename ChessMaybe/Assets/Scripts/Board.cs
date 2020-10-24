@@ -41,7 +41,9 @@ public class Board : MonoBehaviour
     */
 
 
-    public GameObject[,] BuildBoard(bool rebuildBoard = false) {
+    public GameObject[,] BuildBoard(byte[] serverState, bool rebuildBoard = false) {
+
+        //TODO: Place Peices on board according to the server state  
 
         if (boardSpaces != null)
         {

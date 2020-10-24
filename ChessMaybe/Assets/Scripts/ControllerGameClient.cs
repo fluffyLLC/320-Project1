@@ -85,16 +85,16 @@ public class ControllerGameClient : MonoBehaviour
 
         string user = inputUsername.text;
 
-        Buffer packet = PacketBuilder.Join(user);
+        Buffer packet = PacketBuilder.Name(user);
 
         SendPacketToServer(packet);
-    
+        
+
     }
 
     async private void StartRecevingPackets()
     {
         int maxPacketSize = 4096;
-
 
         while (socket.Connected) {
 
@@ -133,22 +133,74 @@ public class ControllerGameClient : MonoBehaviour
                 if (buffer.Length < 5) return;
                 byte joinResponse = buffer.ReadUInt8(4);
 
-                if (joinResponse == 1 || joinResponse == 2 || joinResponse == 3)
-                {
-
-                    controllerGameplay.playerState = joinResponse;
-                    controllerGameplay.SwitchScreenState(ScreenState.Game);
-                }
-                else if (joinResponse == 9) {
-                    controllerGameplay.SwitchScreenState(ScreenState.Conection);
-                } else {
-                    //TODO: show error
+                if (joinResponse > 0) {
+                    SendInitPacket(0);
                     controllerGameplay.SwitchScreenState(ScreenState.Username);
-                    inputUsername.text = "";
-                    print(joinResponse);
+
                 }
 
                 buffer.Consume(5);
+                break;
+            case "NAME":
+                if (buffer.Length < 5) return;
+                byte nameResponse = buffer.ReadUInt8(4);
+
+                if (nameResponse == 1)
+                {
+                    SendInitPacket(0);
+
+                    //controllerGameplay.playerState = nameResponse;
+                    controllerGameplay.SwitchScreenState(ScreenState.Lobby);
+                }
+                else
+                {
+                    //TODO: show error
+                    controllerGameplay.SwitchScreenState(ScreenState.Username);
+                    inputUsername.text = "";
+                    print(nameResponse);
+                }
+
+                buffer.Consume(5);
+                break;
+            case "INIT":
+                print("initrecieved");
+
+                if (buffer.Length < 8) return;
+
+                byte roleResponse = buffer.ReadUInt8(4);
+                byte p1NmL = buffer.ReadUInt8(5);
+                byte p2NmL = buffer.ReadUInt8(6);
+                byte includesInitGmbrd = buffer.ReadUInt8(7);
+
+                int expectedLength = 8 + p2NmL + p2NmL;
+
+                expectedLength += (includesInitGmbrd > 0) ? 64 : 0;
+
+                if (buffer.Length < expectedLength) return;
+
+                controllerGameplay.playerState = (roleResponse > 0) ? roleResponse : controllerGameplay.playerState;
+                controllerGameplay.p1Username = buffer.ReadString(8, p1NmL);
+                controllerGameplay.p2Username = buffer.ReadString(8+p1NmL, p2NmL);
+
+                byte[] spaces = new byte[64];
+
+                if (includesInitGmbrd > 0)
+                {
+                    for (int i = 0; i < 64; i++)
+                    {
+
+                        spaces[i] = buffer.ReadUInt8(6 + i);
+
+                    }
+
+                    controllerGameplay.gameBoard.BuildBoard(spaces,true);
+
+                }
+
+                controllerGameplay.ProcessInit();
+
+                //todo:this number si wrong somehow
+                buffer.Consume(expectedLength);
                 break;
             case "UPDT":
                 if (buffer.Length < 70) return; //TODO: give players the ability to pass
@@ -158,7 +210,7 @@ public class ControllerGameClient : MonoBehaviour
                 byte whoseTurn = buffer.ReadUInt8(4);
                 byte gameStatus = buffer.ReadUInt8(5);
 
-                byte[] spaces = new byte[64];
+                spaces = new byte[64];
 
                 for (int i = 0; i < 64; i++) {
 
@@ -264,6 +316,8 @@ public class ControllerGameClient : MonoBehaviour
             default:
                 print("unknown packet identifyer...");
 
+                buffer.Clear();
+
                 //TODO: clear buffer
 
                 break;
@@ -277,20 +331,20 @@ public class ControllerGameClient : MonoBehaviour
         byte x = buffer.ReadUInt8(4);
         byte y = buffer.ReadUInt8(5);
 
-        if (controllerGameplay.isMyTurn)
-        {
-            //TODO: processBitmask
-        }
-        else
-        {
-            controllerGameplay.HoverPeice(x, y);
-            buffer.Consume(6);
-        }
+        controllerGameplay.HoverPeice(x, y);
+        buffer.Consume(6);
+        
     }
 
     public void Disconnect() {
 
         socket.Close(); //.Dispose();
+    }
+
+    public void SendInitPacket(int desiredRole) {
+        //print("sending Init");
+        SendPacketToServer(PacketBuilder.Init(desiredRole));
+    
     }
 
     async public void SendPacketToServer(Buffer packet) {

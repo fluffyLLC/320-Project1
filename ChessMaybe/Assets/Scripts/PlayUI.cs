@@ -51,7 +51,7 @@ public class PlayUI : MonoBehaviour
 
         if (chatActive)
         {
-            LeanTween.move(chatPanelRect, new Vector3(-Screen.width / 2, 0, 0), chatAnimTime); //moveX(chatPanel.gameObject, 608, 5);
+            LeanTween.move(chatPanelRect, new Vector3(-Screen.width * 0.3f, 0, 0), chatAnimTime); //moveX(chatPanel.gameObject, 608, 5);
             chatButtonText.text = ">";
 
         }
