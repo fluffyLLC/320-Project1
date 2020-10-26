@@ -45,7 +45,8 @@ exports.Server = { //we can use js object notation too
 			//instantiate new client
 
 			const client = new Client(socket,this);
-
+			client.sendPacket(PacketBuilder.join(1));
+			
 			this.clients.push(client);
 			console.log(`client ${this.clients.length} has joined`);
 		}

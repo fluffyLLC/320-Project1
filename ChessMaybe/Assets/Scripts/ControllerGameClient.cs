@@ -61,6 +61,18 @@ public class ControllerGameClient : MonoBehaviour
 
     }
 
+    public void OnNameSubmit()
+    { //come back to this
+
+        string user = inputUsername.text;
+
+        Buffer packet = PacketBuilder.Name(user);
+
+        SendPacketToServer(packet);
+
+
+    }
+
     async public void TryToConnect(string host, int port) {
 
         if (socket.Connected) return;
@@ -72,7 +84,7 @@ public class ControllerGameClient : MonoBehaviour
             if (socket.Connected)
             {
                 StartRecevingPackets();
-                controllerGameplay.SwitchScreenState(ScreenState.Username);
+                //controllerGameplay.SwitchScreenState(ScreenState.Username);
             }
 
         }
@@ -83,19 +95,7 @@ public class ControllerGameClient : MonoBehaviour
         }
 
     }
-
-    
-
-    public void OnNameSubmit() { //come back to this
-
-        string user = inputUsername.text;
-
-        Buffer packet = PacketBuilder.Name(user);
-
-        SendPacketToServer(packet);
-        
-
-    }
+ 
 
     async private void StartRecevingPackets()
     {
@@ -180,7 +180,7 @@ public class ControllerGameClient : MonoBehaviour
 
                 int expectedLength = 8 + p1NmL + p2NmL;
 
-                print("expectedLength first Half = " + expectedLength);
+                //print("expectedLength first Half = " + expectedLength);
 
                 expectedLength += (includesInitGmbrd > 0) ? 64 : 0;
 
@@ -209,7 +209,7 @@ public class ControllerGameClient : MonoBehaviour
 
                 controllerGameplay.ProcessInit();
 
-                print("expectedLength Before Consumption = " + expectedLength);
+                //print("expectedLength Before Consumption = " + expectedLength);
 
                 
                 buffer.Consume(expectedLength);
@@ -229,8 +229,10 @@ public class ControllerGameClient : MonoBehaviour
                     spaces[i] = buffer.ReadUInt8(6 + i);
                 
                 }
+                print("whoseTurn in update" + whoseTurn);
 
-                print(spaces);
+
+                //print(spaces);
 
 
 
@@ -363,7 +365,7 @@ public class ControllerGameClient : MonoBehaviour
         socket.Close(); //.Dispose();
     }
 
-
+    #region packet sending
     public void SendPassPacket() {
 
         SendPacketToServer(PacketBuilder.Pass());
@@ -385,7 +387,7 @@ public class ControllerGameClient : MonoBehaviour
 
     
     }
-
+    /*
     public void SendPlayPacket(int x, int y) {
         //Buffer packet = PacketBuilder.Play(x, y);
 
@@ -396,7 +398,7 @@ public class ControllerGameClient : MonoBehaviour
 
     }
 
-
-
+    */
+    #endregion
 
 }

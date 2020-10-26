@@ -87,7 +87,10 @@ public class LobbyUI : MonoBehaviour
         }
 
         if (quedPlayers == 2 && playerRole > 0) {
-            game.SwitchScreenState(ScreenState.Game);
+            if (game.screenState == ScreenState.Lobby)
+            {
+                game.SwitchScreenState(ScreenState.Game);
+            }
         }
 
     

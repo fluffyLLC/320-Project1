@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum ScreenState
 {
@@ -34,12 +35,16 @@ public class ControllerGameplay : MonoBehaviour
 
     public int playerState = 0; // are we player 1 player 2 or a spectator (1, 2, and 3 respectivly)
     public bool peiceSelected = false;
-    public bool isMyTurn = false;
+    public int whosTurn = 0; 
 
     PlayerPeice peice;
 
+
     public string p1Username = "none";
     public string p2Username = "none";
+
+
+    
     //BoardSegment segment;
 
     Vector2 selectedPeice = new Vector2(-1, -1);
@@ -240,6 +245,10 @@ public class ControllerGameplay : MonoBehaviour
 
     public void ProcessUpdate(int gameStatus, int whoseTurn, byte[] spaces) {
 
+        whosTurn = whoseTurn;
+
+        playUI.UpdateTurnDisplay(whoseTurn);
+
         if (gameBoard.HandleMove(spaces)) {
             peiceSelected = false;
             peice = null;
@@ -267,8 +276,8 @@ public class ControllerGameplay : MonoBehaviour
     }
 
     public void ProcessInit() {
-        playUI.whiteUserDisplay.text = $"White is {p1Username}";
-        playUI.blackUserDisplay.text = $"Black is {p2Username}";
+        playUI.whiteUserDisplay.text = $"White: {p1Username}";
+        playUI.blackUserDisplay.text = $"Black: {p2Username}";
         lobbyUI.UpdateState(p1Username, p2Username, playerState);
     
     }
@@ -297,7 +306,7 @@ public class ControllerGameplay : MonoBehaviour
                 cameraController.pauseCamRig = true;
                 break;
             case ScreenState.Lobby:
-                screenState = ScreenState.Username;
+                screenState = ScreenState.Lobby;
                 paneHostDetails.gameObject.SetActive(false);
                 panelUsername.gameObject.SetActive(false);
                 panelLobby.gameObject.SetActive(true);

@@ -87,7 +87,7 @@ exports.Client = class Client{
 					}
 
 					this.sendPacket(PacketBuilder.init(this.role,true,this.server.game));
-					//this.server.broadcastToAllExcept(PacketBuilder.init(this.role,false,this.server.game),this);
+					this.server.broadcastToAllExcept(PacketBuilder.init(this.role,false,this.server.game),this);
 
 					this.buffer = this.buffer.slice(5);
 
@@ -144,6 +144,7 @@ exports.Client = class Client{
 
 						this.server.game.movePeiceInState(currentX,currentY,targetX,targetY);
 						this.server.game.toggleTurn();
+						console.log("Player Turn:" + this.server.game.whoseTurn);
 						this.server.broadcastToAll(PacketBuilder.update(this.server.game));
 
 
@@ -174,19 +175,21 @@ exports.Client = class Client{
 					this.buffer = this.buffer.slice(6);
 
 				break;
-				default:
-					console.log("ERROR: packet identifyer not recognised (" +packetIdentifier+")");
-					this.buffer = Buffer.alloc(0);
-				break;
 				case "PASS":
 					if(this.server.game.isClientTurn(this)){
 
 						this.server.game.toggleTurn();
+						this.server.broadcastToAll(PacketBuilder.update(this.server.game));
 
 					}
 
 					this.buffer = this.buffer.slice(4);
 				break;
+				default:
+					console.log("ERROR: packet identifyer not recognised (" +packetIdentifier+")");
+					this.buffer = Buffer.alloc(0);
+				break;
+
 
 			}
 

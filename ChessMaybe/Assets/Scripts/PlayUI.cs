@@ -27,15 +27,31 @@ public class PlayUI : MonoBehaviour
     public Text whiteUserDisplay; //My need to change type
     public Text blackUserDisplay;
 
+    public Transform chatNotif;
 
-    
 
-    
+    public Image p1NamePannel;
+    public Image p2NamePannel;
+
+
+    public Color p1NamePannelOff;
+    public Color p2NamePannelOff;
+
+
+
     void Start()
     {
         ToggleChat();
         TogglePlayOptions();
-       // chatPanelLTRect = (LTRect)chatPanelRect;
+
+        //UpdateTurnDisplay(game.whosTurn);
+
+        p1NamePannel.color = Color.white;
+        p2NamePannel.color = p2NamePannelOff;
+
+        //p1NamePannel.color = Color.white;
+        //p2NamePannel.color = p2NamePannelOff;
+        // chatPanelLTRect = (LTRect)chatPanelRect;
     }
 
     /*
@@ -56,7 +72,7 @@ public class PlayUI : MonoBehaviour
 
         }
         else {
-
+            chatNotif.gameObject.SetActive(false);
             LeanTween.move(chatPanelRect, Vector3.zero, chatAnimTime);
             chatButtonText.text = "<";
 
@@ -86,16 +102,44 @@ public class PlayUI : MonoBehaviour
 
     }
 
+    public void UpdateTurnDisplay(int whosTurn) {
+        print("player turn: " + whosTurn);
+        if (whosTurn == 1)
+        {
+            p1NamePannel.color = Color.white;
+            p2NamePannel.color = p2NamePannelOff;
+        }
+        else {
+
+            p1NamePannel.color = p1NamePannelOff;
+            p2NamePannel.color = Color.black;
+        }
+        
+        
+    }
+
     public void SendChat() {
 
         game.SendChat(message.text);
 
         message.text = "";
         message.Select();
+
+       
+
+
     }
 
     public void AddMessageToChat(string chatMessage) {
+
         chatDisplay.text += chatMessage;
-    
+
+        if (!chatActive)
+        {
+            //print()
+            chatNotif.gameObject.SetActive(true);
+
+        }
+
     }
 }
