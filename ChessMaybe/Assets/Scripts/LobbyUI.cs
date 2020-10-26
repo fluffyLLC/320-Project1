@@ -60,7 +60,7 @@ public class LobbyUI : MonoBehaviour
             if (playerRole == 2)
             {
                 joinAsWhite.interactable = false;
-                joinAsBlackText.text = "Waiting For Player";
+                joinAsWhiteText.text = "Waiting For Player";
                 joinAsSpectator.interactable = false;
                 joinAsSpectatorText.text = "";
 

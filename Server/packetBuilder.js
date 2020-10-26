@@ -128,13 +128,16 @@ exports.PacketBuilder = {
 	getBoardStatePacket(game){
 
 		const packet = Buffer.alloc(64);
+
 		let offset = 0;
 
 		for(let y = 0; y < game.board.length;y++ ){
 
 				for(let x = 0; x < game.board[y].length;x++ ){
-				
+					
+					//var stateasnum = this.boardStateToNum(game.board[y][x]);
 					packet.writeUInt8(this.boardStateToNum(game.board[y][x]),offset);
+					//console.log(`Board state as num at offset:${offset} is ${stateasnum}`);
 				
 					offset++;
 

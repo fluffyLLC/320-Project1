@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum Peices { 
+public enum Peices {
+    Empty,
     Pawn,
     Rook,
     Knight,
     Bishop,
     Queen,
     King,
-    Empty
+    
 }
 
 
@@ -49,7 +50,7 @@ public class PlayerPeice : MonoBehaviour
     public void init(Transform location, Peices peice, Material mat, int owner){
         peiceType = peice;
         this.owner = owner;
-        Quaternion rot = owner == 1 ? Quaternion.identity : Quaternion.Euler(0,180,0);
+        Quaternion rot = (owner == 1) ? Quaternion.identity : Quaternion.Euler(0,180,0);
         //print(mat.name);
         switch (peice)
         {
@@ -79,6 +80,8 @@ public class PlayerPeice : MonoBehaviour
 
 
     }
+
+
 
     void Update() {
 
@@ -111,7 +114,7 @@ public class PlayerPeice : MonoBehaviour
 
     private void HandleInstantiateMesh(Material mat, Quaternion rot, Peices peice)
     {
-        mesh = InstantiateMesh(meshPath[(int)peice], transform, rot);
+        mesh = InstantiateMesh(meshPath[(int)peice-1], transform, rot);
         mesh.AddComponent<CapsuleCollider>();
         mesh.layer = LayerMask.NameToLayer("Peices");
 

@@ -175,8 +175,17 @@ exports.Client = class Client{
 
 				break;
 				default:
-				console.log("ERROR: packet identifyer not recognised (" +packetIdentifier+")");
-				this.buffer = Buffer.alloc(0);
+					console.log("ERROR: packet identifyer not recognised (" +packetIdentifier+")");
+					this.buffer = Buffer.alloc(0);
+				break;
+				case "PASS":
+					if(this.server.game.isClientTurn(this)){
+
+						this.server.game.toggleTurn();
+
+					}
+
+					this.buffer = this.buffer.slice(4);
 				break;
 
 			}

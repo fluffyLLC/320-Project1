@@ -40,7 +40,7 @@ public class Board : MonoBehaviour
     }
     */
 
-
+    #region BoardGeneration
     public GameObject[,] BuildBoard(byte[] serverState, bool rebuildBoard = false) {
 
         //TODO: Place Peices on board according to the server state  
@@ -67,12 +67,18 @@ public class Board : MonoBehaviour
 
             for (int x = 0; x < boardSize; x++)
             {
-                GameObject b = InstantiateSegmant(new Vector3((segmentSpaceing) *x, 0, (segmentSpaceing) * y));//spawn board peices
-                boardSpaces[x, y] = b; //store a refrence to the peice
+                GameObject b = InstantiateSegmant(new Vector3((segmentSpaceing) *x, 0, (segmentSpaceing) * y));//spawn board segmants
+                boardSpaces[x, y] = b; //store a refrence to the segmant
                 BoardSegment bs = b.GetComponent<BoardSegment>(); //
                 bs.init(new BoardPOS(x, y),blackMat,whiteMat);
 
-                GameObject peice = bs.PopulateStart();
+                //print("totalIterations: " + totalIterations);
+
+                //int sState = (int)serverState[totalIterations];
+
+                //print("serverState: " + (SegmentOccupationState)serverState[totalIterations]);
+
+                GameObject peice = bs.PopulateStart((SegmentOccupationState)serverState[totalIterations]);
 
                 if (peice) {
                     peices[x, y] = peice;
@@ -91,6 +97,8 @@ public class Board : MonoBehaviour
                 {
                         SwapToBlack(b);
                 }
+
+
                 totalIterations++;
 
 
@@ -146,6 +154,14 @@ public class Board : MonoBehaviour
 
     }
 
+    public GameObject InstantiateSegmant(Vector3 pos)
+    {
+
+        //boardSegment = Resources.Load<GameObject>("Prefabs/BoardSegment") as GameObject; <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Success!!!!!!!!!
+
+        return Instantiate(Resources.Load<GameObject>("Prefabs/BoardSegment"), pos, Quaternion.identity, transform) as GameObject;
+
+    }
 
     private void SwapToBlack(GameObject b)
     {
@@ -153,6 +169,8 @@ public class Board : MonoBehaviour
         m.material = blackMat;
         //m.sharedMaterial.color = Color.black;
     }
+
+    #endregion
 
     public bool HandleMove(byte[] updatedState) {
         Vector2 currentIndex = new Vector2(-1, -1);
@@ -244,12 +262,6 @@ public class Board : MonoBehaviour
 
     
 
-    public GameObject InstantiateSegmant(Vector3 pos) {
-
-        //boardSegment = Resources.Load<GameObject>("Prefabs/BoardSegment") as GameObject; <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Success!!!!!!!!!
-
-        return Instantiate(Resources.Load<GameObject>("Prefabs/BoardSegment"), pos, Quaternion.identity,transform) as GameObject;
-
-    }
+   
 
 }

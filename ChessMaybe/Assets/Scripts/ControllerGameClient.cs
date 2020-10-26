@@ -58,7 +58,6 @@ public class ControllerGameClient : MonoBehaviour
         UInt16.TryParse(inputPort.text, out ushort port);
 
         TryToConnect(host, port);
-        
 
     }
 
@@ -84,6 +83,8 @@ public class ControllerGameClient : MonoBehaviour
         }
 
     }
+
+    
 
     public void OnNameSubmit() { //come back to this
 
@@ -191,12 +192,14 @@ public class ControllerGameClient : MonoBehaviour
 
                 byte[] spaces = new byte[64];
 
+                int tempOffset = 8 + p1NmL + p2NmL;
+
                 if (includesInitGmbrd > 0)
                 {
                     for (int i = 0; i < 64; i++)
                     {
 
-                        spaces[i] = buffer.ReadUInt8(6 + i);
+                        spaces[i] = buffer.ReadUInt8(tempOffset + i);
 
                     }
 
@@ -230,6 +233,7 @@ public class ControllerGameClient : MonoBehaviour
                 print(spaces);
 
 
+
                 controllerGameplay.ProcessUpdate(gameStatus, whoseTurn, spaces);
 
                 if (controllerGameplay.screenState != ScreenState.Game) {
@@ -251,36 +255,45 @@ public class ControllerGameClient : MonoBehaviour
                 switch (errorCode) {
                     case 0:
                         print("Move Is Legal");
+
                         break;
 
                     case 1:
                         print("Move invalid, Move is off of the board");
+
                         break;
                     case 2:
                         print("Move invalid, Player does not own peice");
+
                         break;
 
                     case 3:
                         print("Move invalid, Board space Is Empty");
+
                         break;
 
                     case 4:
                         print("Move invalid, Player is stepping on themselves");
+
                         break;
 
                     case 5:
                         print("Move invalid, It is not the current players turn");
+
                         break;
 
                     case 6:
                         print("Move invalid, Move is not valid for the type of peice");
+
                         break;
 
                     case 7:
                         print("Move invalid, Path is blocked by one of the player's peices");
+
                         break;
                     case 8:
                         print("Move invalid, Move is not valid for an unspecified reason");
+
                         break;
 
                 }
@@ -348,6 +361,13 @@ public class ControllerGameClient : MonoBehaviour
     public void Disconnect() {
 
         socket.Close(); //.Dispose();
+    }
+
+
+    public void SendPassPacket() {
+
+        SendPacketToServer(PacketBuilder.Pass());
+
     }
 
     public void SendInitPacket(int desiredRole) {

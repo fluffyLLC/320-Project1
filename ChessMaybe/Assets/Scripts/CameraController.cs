@@ -6,11 +6,13 @@ public class CameraController : MonoBehaviour
 {
     public Transform controller;
     public Transform cam;
+    public float animDegreesPerSec;
     float boardLength;
     float moveMod = 30;
     public bool pauseCamRig  = false;
     //Vector3 mousePositionPrev;
     Vector3 localRotaion = new Vector3(30,0,0);
+    Vector3 localAnimRotaion = new Vector3(30,0,0);
     Vector3 localPosition;
     Vector3 localCamPostition;
 
@@ -23,6 +25,7 @@ public class CameraController : MonoBehaviour
         controller.position = localPosition;
         localCamPostition = new Vector3(0,0, -14);
         cam.localPosition = localCamPostition;
+        
     }
 
     // Update is called once per frame
@@ -32,15 +35,16 @@ public class CameraController : MonoBehaviour
         if (!pauseCamRig)
         {
             //zoom in and out
-            
 
-            if (Input.GetMouseButtonDown(2)|| Input.GetMouseButtonDown(1))
+
+            if (Input.GetMouseButtonDown(2) || Input.GetMouseButtonDown(1))
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 //print("down");
 
             }
-            else if (Input.GetMouseButtonUp(2) && !Input.GetMouseButton(1) || Input.GetMouseButtonUp(1) && !Input.GetMouseButton(2)) {
+            else if (Input.GetMouseButtonUp(2) && !Input.GetMouseButton(1) || Input.GetMouseButtonUp(1) && !Input.GetMouseButton(2))
+            {
                 Cursor.lockState = CursorLockMode.Confined;
                 //print("up");
 
@@ -56,7 +60,8 @@ public class CameraController : MonoBehaviour
 
                 cam.localPosition = localCamPostition;
 
-            }else if (Input.GetMouseButton(2))
+            }
+            else if (Input.GetMouseButton(2))
             {
 
                 localRotaion.x = Mathf.Clamp((Input.GetAxis("Mouse Y") * -1) + localRotaion.x, -100, 100);
@@ -71,20 +76,30 @@ public class CameraController : MonoBehaviour
 
 
             }
-            else if (Input.GetMouseButton(1)) {
-                localPosition.x = Mathf.Clamp((Input.GetAxis("Mouse X")*moveMod*Time.deltaTime) + localPosition.x, 0, boardLength);
-                localPosition.z = Mathf.Clamp(((Input.GetAxis("Mouse Y")*-1)*moveMod*Time.deltaTime) + localPosition.z, 0, boardLength);
+            else if (Input.GetMouseButton(1))
+            {
+                localPosition.x = Mathf.Clamp((Input.GetAxis("Mouse X") * moveMod * Time.deltaTime) + localPosition.x, 0, boardLength);
+                localPosition.z = Mathf.Clamp(((Input.GetAxis("Mouse Y") * -1) * moveMod * Time.deltaTime) + localPosition.z, 0, boardLength);
 
                 controller.position = localPosition;
-            
+
             }
 
 
             //
 
 
-           // mousePositionPrev = Input.mousePosition;
+            // mousePositionPrev = Input.mousePosition;
             //transform.position = new Vector3(target.position.x, target.position.y + 1, target.position.z);
+        }
+        else {
+
+            localAnimRotaion.y += animDegreesPerSec * Time.deltaTime;
+
+
+
+            controller.rotation = Quaternion.Euler(localAnimRotaion);
+
         }
 
     }

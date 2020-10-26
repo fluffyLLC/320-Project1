@@ -25,7 +25,7 @@ public struct BoardPOS
         get {
 
             return _x; //////////////////////////////////////////////crashes, don't use itwaitactueally
-        
+
         }
         set {
             switch (value)
@@ -58,7 +58,7 @@ public struct BoardPOS
                     _x = "Error: Invalid Index. x value beyond the scoope of 0-7";
                     break;
             }
-        } 
+        }
 
     }
     public string y {
@@ -71,10 +71,11 @@ public struct BoardPOS
                 _y = value;
 
             }
-            else {
+            else
+            {
 
                 _y = "Error: Invalid Index. y value beyond the scoope of 0-7";
-                
+
             }
         }
     }
@@ -134,26 +135,28 @@ public class BoardSegment : MonoBehaviour
         this.pos = pos;
         this.blackMat = blackMat;
         this.whiteMat = whiteMat;
-        
+
         //return PopulateStart();
 
     }
 
-    public GameObject PopulateStart() {
+    public GameObject PopulateStart()//populates this segmant based on the BoardPOS of this segmant
+    {
         GameObject playerPeice = null;
         Material peiceMat;
         int player;
         bool isPlayer1 = false;
 
-        
+
 
         if (pos.indexY > 5)
         {
             peiceMat = blackMat;
             player = 2;
-            
+
         }
-        else {
+        else
+        {
             peiceMat = whiteMat;
             player = 1;
             isPlayer1 = true;
@@ -167,10 +170,12 @@ public class BoardSegment : MonoBehaviour
 
         }
 
-        else if (pos.indexY == 0 || pos.indexY == 7) {
+        else if (pos.indexY == 0 || pos.indexY == 7)
+        {
 
             //print("Spawning peice at " + pos.x + ", " + pos.y);
-            switch (pos.indexX) {
+            switch (pos.indexX)
+            {
 
                 case 0:
                 case 7:
@@ -195,16 +200,60 @@ public class BoardSegment : MonoBehaviour
                     break;
 
                 default:
-                    
+
                     break;
-           
+
             }
 
 
         }
 
-       return playerPeice;
+        return playerPeice;
     }
+
+    public GameObject PopulateStart(SegmentOccupationState serverState)//populates this segmant based on the state of the server
+    {
+        state = serverState;
+        if (serverState == SegmentOccupationState.Empty) return null;
+
+        GameObject playerPeice = null;
+        Material peiceMat = whiteMat;
+        int player = 0;
+        int peice = 0;
+        bool isPlayer1 = false;
+
+        if ((int)serverState > 0 && (int)serverState <= 6)//if it is a player 1 peice
+        {
+            peice = (int)serverState;
+            //peiceMat = whiteMat;
+            player = 1;
+            isPlayer1 = true;
+
+        }
+        else if ((int)serverState != 0 && (int)serverState >= 7)
+        {//if it is a player 2 peice
+
+            peice = (int)serverState - 6;
+            peiceMat = blackMat;
+            player = 2;
+            isPlayer1 = false;
+
+        }
+        else {
+            print("Error: server state out of bounds");
+        }
+
+        playerPeice = HandleInstantiatePeice(peiceMat, player, isPlayer1, (Peices)peice);
+
+
+        return playerPeice;
+
+    }
+
+
+
+
+
 
     private GameObject HandleInstantiatePeice(Material peiceMat, int player, bool isPlayer1, Peices peice)
     {
@@ -217,6 +266,8 @@ public class BoardSegment : MonoBehaviour
 
         return playerPeice;
     }
+
+    
 
     private void SetPeice(bool isPlayer1, Peices peice)
     {
@@ -249,7 +300,8 @@ public class BoardSegment : MonoBehaviour
         }
     }
 
-    public GameObject InstantiatePeice() {
+    public GameObject InstantiatePeice()
+    {
 
 
         return Instantiate(Resources.Load<GameObject>("Prefabs/PlayerPeice"), snapPointPlaced.position, Quaternion.identity) as GameObject;
@@ -258,21 +310,23 @@ public class BoardSegment : MonoBehaviour
     }
 
 
-    public void ToggleGlow() {
+    public void ToggleGlow()
+    {
 
         SetGlowActive(!glow.activeSelf);
-        
+
     }
 
     //,make private?
-    public void SetGlowActive(bool isActive = true) {
+    public void SetGlowActive(bool isActive = true)
+    {
 
         glow.SetActive(isActive);
 
     }
 
 
-   
+
 
     /*
     // Start is called before the first frame update

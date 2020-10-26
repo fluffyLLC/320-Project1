@@ -15,6 +15,17 @@ public static class PacketBuilder
 
         return packet;
     }
+    public static Buffer Pass()
+    {
+        //int packetLength = 4;
+        Buffer packet = Buffer.Alloc(4);
+
+        packet.WriteString("PASS");
+        //packet.WriteUInt8((byte)username.Length, 4);
+        //packet.WriteString(username, 5);
+
+        return packet;
+    }
 
 
     public static Buffer Init(int desiredRole) {
@@ -28,6 +39,7 @@ public static class PacketBuilder
 
         return packet;
     }
+
 
 
     public static Buffer Chat(string message) {

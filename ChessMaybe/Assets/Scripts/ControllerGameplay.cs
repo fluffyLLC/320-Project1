@@ -66,7 +66,6 @@ public class ControllerGameplay : MonoBehaviour
                 {
                     HandleSelection();
 
-
                 }
             }//aren't using camera controlls
         }//isGameState
@@ -103,10 +102,6 @@ public class ControllerGameplay : MonoBehaviour
                 {
 
                     return;
-
-                    //if () return;//if 
-
-                    //isPeice = false;
 
                 }
 
