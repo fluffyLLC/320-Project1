@@ -170,12 +170,12 @@ CHAT (placeHolder)- when reciving a chat packet from a client the server sends t
 Packets from Client
 -------------------
 
-NAME (request) (placeHolder) - after establishing a connection w/the server, clinet will send a JOIN packet w/ a desired username. 	The server will send back a response.
+NAME (request) - after establishing a connection w/the server, clinet will send a JOIN packet w/ a desired username. 	The server will send back a response.
 
 
 	O	L	Datatype	Desc
 	-------------------------------------------------------
-	0	4	ASCII		packet type "JOIN"
+	0	4	ASCII		packet type "NAME"
 	4	1	uint8		howlong teh username is (255 max)
 	5	?	ascii		the desired username	
 
@@ -228,8 +228,6 @@ UNDO -
 O	L	DATATYPE	DESC
 	-----------------------------------------------------
 	0	4	ASCII		packet type:"UNDO"
-
-
 
 CHAT - the player wants to chat.
 	

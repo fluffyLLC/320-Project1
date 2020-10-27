@@ -32,7 +32,7 @@ public class ControllerGameClient : MonoBehaviour
 
     void Start()
     {
-        buffer.validPacketIdentifyers = new string[] {"JOIN", "UPDT", "CHAT"};
+       // buffer.validPacketIdentifyers = new string[] {"JOIN", "UPDT", "CHAT"};
         
         //implimented singleton design pattern
         if (singleton)
@@ -222,6 +222,8 @@ public class ControllerGameClient : MonoBehaviour
                 byte whoseTurn = buffer.ReadUInt8(4);
                 byte gameStatus = buffer.ReadUInt8(5);
 
+                print("victory: " + gameStatus);
+
                 spaces = new byte[64];
 
                 for (int i = 0; i < 64; i++) {
@@ -229,6 +231,7 @@ public class ControllerGameClient : MonoBehaviour
                     spaces[i] = buffer.ReadUInt8(6 + i);
                 
                 }
+
                 print("whoseTurn in update" + whoseTurn);
 
 
@@ -335,6 +338,12 @@ public class ControllerGameClient : MonoBehaviour
                 if (buffer.Length <= 5) return;
 
                 HandleHover();
+
+                break;
+            case "CHEK":
+
+                break;
+            case "CKMT":
 
                 break;
             default:

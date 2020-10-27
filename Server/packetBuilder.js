@@ -75,6 +75,22 @@ exports.PacketBuilder = {
 
 		return packet;
 	},
+	check(){
+		
+		const packet = Buffer.alloc(4);
+		packet.write("CHEK",0);
+		//packet.writeUInt8(responseID,4);
+		return packet
+
+
+	},
+	checkmate(){
+		const packet = Buffer.alloc(4);
+		packet.write("CKMT",0);
+		//acket.writeUInt8(responseID,4);
+		return packet
+
+	},
 	chat(username,message){
 		let usernameLength = username.length;
 		let messageLength = message.length; 

@@ -128,7 +128,7 @@ exports.Client = class Client{
 
 
 				break;
-				case "PLAY": 
+				case "PLAY":  
 					if(this.buffer.length < 8) return;
 
 					const currentX = this.buffer.readUInt8(4);
@@ -142,6 +142,7 @@ exports.Client = class Client{
 					//TODO: decouple move & turn checks from data mod and return an error number for invalid moves
 					if(moveCode == 0) {
 
+						var victory = this.server.game.checkForWin(targetX,targetY);
 						this.server.game.movePeiceInState(currentX,currentY,targetX,targetY);
 						this.server.game.toggleTurn();
 						console.log("Player Turn:" + this.server.game.whoseTurn);
@@ -154,6 +155,11 @@ exports.Client = class Client{
 					
 
 					//this.server.game.playMove(this,x,y);
+
+					if(victory){
+
+						this.server.game.reset();
+					}
 
 					this.buffer = this.buffer.slice(8);
 
@@ -184,6 +190,29 @@ exports.Client = class Client{
 					}
 
 					this.buffer = this.buffer.slice(4);
+				break;
+				case "CHEK":
+					if(this == this.server.game.clientP1){
+						this.server.game.clientP2.sendPacket(PacketBuilder.check());
+
+					}if(this == this.server.game.clientP2){
+						this.server.game.clientP1.sendPacket(PacketBuilder.check());
+
+					}
+
+					this.buffer = this.buffer.slice(4);
+				break;
+				case "CKMT":
+					if(this == this.server.game.clientP1){
+						this.server.game.clientP2.sendPacket(PacketBuilder.check());
+
+					}if(this == this.server.game.clientP2){
+						this.server.game.clientP1.sendPacket(PacketBuilder.checkmate());
+
+					}
+
+					this.buffer = this.buffer.slice(4);
+
 				break;
 				default:
 					console.log("ERROR: packet identifyer not recognised (" +packetIdentifier+")");

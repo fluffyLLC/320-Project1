@@ -64,9 +64,9 @@ exports.Server = { //we can use js object notation too
 	},
 
 	onClientDisonnect(client){
-		//const index = this.clients.indexOf(client); //find object in array
+		const index = this.clients.indexOf(client); //find object in array
 
-		//if(index >= 0) this.clients.splice(index,1); //remove object from array
+		if(index >= 0) this.clients.splice(index,1); //remove object from array
 /*
 		if(client == game.clientP1){
 

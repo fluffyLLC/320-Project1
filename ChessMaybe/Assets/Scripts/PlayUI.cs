@@ -29,6 +29,10 @@ public class PlayUI : MonoBehaviour
 
     public Transform chatNotif;
 
+    public Transform victoryPanle;
+    public TextMeshProUGUI victoryText;
+    
+
 
     public Image p1NamePannel;
     public Image p2NamePannel;
@@ -116,6 +120,18 @@ public class PlayUI : MonoBehaviour
         }
         
         
+    }
+
+    public void UpdateVictory(int whosWon) {
+        if (whosWon == 1) {
+            victoryText.text = "Victory For " + game.p1Username;
+        }else if (whosWon == 2)
+        {
+            victoryText.text = "Victory For " + game.p2Username;
+        }
+
+        victoryPanle.gameObject.SetActive(true);
+
     }
 
     public void SendChat() {

@@ -35,8 +35,7 @@ exports.Game = {
 	}, toggleTurn(){
 		this.whoseTurn = (this.whoseTurn == 1) ? 2 : 1;//toggles turn to next player
 
-	},
-	isClientTurn(client){
+	},isClientTurn(client){
 		return true;//TODO: Remove This
 
 		if(this.whoseTurn == 1 && client == this.clientP1) return true;
@@ -44,6 +43,32 @@ exports.Game = {
 
 		return false;
 		
+	},checkForWin(targetX,targetY){//ths should be runb pnly after checking if a move is valid
+
+		if(this.board[targetY][targetX] == "K1"){
+			this.whoHasWon = 2;
+			
+			
+
+			return true;
+
+		}else if(this.board[targetY][targetX] == "K2"){
+			this.whoHasWon = 1;
+
+			return true;
+		}
+
+		return false;
+	},
+	reset(){
+			this.clientP1 = null;
+			this.clientP2 = null;
+
+			this.board =  [["R1","N1","B1","K1","Q1","B1","N1","R1"],["P1","P1","P1","P1","P1","P1","P1","P1"],[ 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ], [ 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ],[ 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ],[ 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ],["P2","P2","P2","P2","P2","P2","P2","P2"],["R2","N2","B2","K2","Q2","B2","N2","R2"],];
+
+
+			this.whoHasWon = 0;
+			this.whoseTurn = 1;
 	},
 	movePeiceInState(currentX,currentY,targetX,targetY){
 		

@@ -34,6 +34,7 @@ public class ControllerGameplay : MonoBehaviour
     public LobbyUI lobbyUI;
 
     public int playerState = 0; // are we player 1 player 2 or a spectator (1, 2, and 3 respectivly)
+    public int victoryState = 0; // are we player 1 player 2 or a spectator (1, 2, and 3 respectivly)
     public bool peiceSelected = false;
     public int whosTurn = 0; 
 
@@ -59,6 +60,7 @@ public class ControllerGameplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (victoryState != 0) return;
         if (playerState == 0) return;
         //print(playerState);
         if (screenState == ScreenState.Game && playerState != 3)
@@ -255,6 +257,21 @@ public class ControllerGameplay : MonoBehaviour
             // segment = null;
         }
 
+        if (gameStatus > 0) {
+            playUI.UpdateVictory(gameStatus);
+        
+        
+        }
+
+
+    }
+
+    public void ReturnToLobby() {
+
+        SwitchScreenState(ScreenState.Lobby);
+        victoryState = 0;
+        playerState = 0;
+        gameBoard.DeconstructBoard();
 
     }
 
@@ -273,6 +290,7 @@ public class ControllerGameplay : MonoBehaviour
 
     public void AddMessageToChatDisplay(string message) {
         playUI.AddMessageToChat(message);
+
     }
 
     public void ProcessInit() {
@@ -306,6 +324,7 @@ public class ControllerGameplay : MonoBehaviour
                 cameraController.pauseCamRig = true;
                 break;
             case ScreenState.Lobby:
+                ControllerGameClient.singleton.SendInitPacket(0);
                 screenState = ScreenState.Lobby;
                 paneHostDetails.gameObject.SetActive(false);
                 panelUsername.gameObject.SetActive(false);
